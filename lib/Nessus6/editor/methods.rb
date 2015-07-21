@@ -1,4 +1,7 @@
+require 'json'
+
 module Nessus6
+  # The Editor class is for interacting with Nessus6 templates
   class Editor
     def initialize(client)
       @client = client

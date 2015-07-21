@@ -2,6 +2,7 @@ require 'hurley'
 require 'Nessus6/version'
 require 'Nessus6/editor/methods'
 require 'Nessus6/session/methods'
+require 'Nessus6/users/methods'
 
 module Nessus6
   # The Client class is used to interact with the Nessus API
