@@ -11,7 +11,7 @@ module Nessus6
     def create(username, password)
       response = @client.post('session',
                           username: username, password: password)
-      verified = verify_response response
+      verified = verify response
       @token = verified['token']
     end
 
@@ -36,26 +36,26 @@ module Nessus6
       else
         fail "User's name or email was not provided in hash form."
       end
-      verify_response response
+      verify response
     end
 
     def get
-      verify_response @client.get('session')
+      verify @client.get('session')
     end
 
     def password(new_password)
       response = @client.put('session/chpasswd', password: new_password)
-      verify_response response
+      verify response
     end
 
     def keys
       response = @client.put('session/keys')
-      verify_response response
+      verify response
     end
 
     private
 
-    def verify_response(response)
+    def verify(response)
       case response.status_code
       when 200
         return JSON.parse response.body
