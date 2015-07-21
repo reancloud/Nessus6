@@ -36,5 +36,9 @@ module Nessus6
           ' secret key.'
       end
     end
+
+    def logout
+      @session.destroy
+    end
   end
 end
