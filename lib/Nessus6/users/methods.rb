@@ -1,4 +1,9 @@
 require 'json'
+require 'Nessus6/errors/bad_request'
+require 'Nessus6/errors/conflict'
+require 'Nessus6/errors/forbidden'
+require 'Nessus6/errors/internal_server_error'
+require 'Nessus6/errors/not_found'
 
 module Nessus6
   class Users
@@ -64,11 +69,11 @@ module Nessus6
       when 200
         return JSON.parse response.body
       when 400
-        fail 'Field is invalid'
+        fail BadRequestError, 'Field is invalid'
       when 403
-        fail 'You do not have permission to create this user'
+        fail ForbiddenError, 'You do not have permission to create this user'
       when 409
-        fail 'User already exists'
+        fail ConflictError, 'User already exists'
       else
         return false
       end
@@ -79,13 +84,14 @@ module Nessus6
       when 200
         return true
       when 403
-        fail 'Not authorized to delete users'
+        fail ForbiddenError, 'Not authorized to delete users'
       when 404
-        fail 'You do not have permission to delete this user'
+        fail NotFoundError, 'You do not have permission to delete this user'
       when 409
-        fail 'Cannot delete your own account'
+        fail ConflictError, 'Cannot delete your own account'
       when 500
-        fail 'Failed to delete the user due to an interal server error'
+        fail InternalServerError,
+             'Failed to delete the user due to an interal server error'
       else
         return false
       end
@@ -96,13 +102,13 @@ module Nessus6
       when 200
         return JSON.parse response.body
       when 400
-        fail 'Field is invalid'
+        fail BadRequestError, 'Field is invalid'
       when 403
-        fail 'You do not have permission to edit this user'
+        fail ForbiddenError, 'You do not have permission to edit this user'
       when 404
-        fail 'User does not exist'
+        fail NotFoundError, 'User does not exist'
       when 409
-        fail 'Cannot edit your own permissions'
+        fail ConflictError, 'Cannot edit your own permissions'
       else
         return false
       end
@@ -113,7 +119,7 @@ module Nessus6
       when 200
         return JSON.parse response.body
       when 404
-        fail 'User does not exist'
+        fail NotFoundError, 'User does not exist'
       else
         return false
       end
@@ -124,7 +130,7 @@ module Nessus6
       when 200
         return JSON.parse response.body
       when 403
-        fail 'You do not have permission to view the list'
+        fail ForbiddenError, 'You do not have permission to view the list'
       else
         return false
       end
@@ -135,13 +141,14 @@ module Nessus6
       when 200
         return true
       when 400
-        fail 'Password is too short'
+        fail BadRequestError, 'Password is too short'
       when 403
-        fail 'You do not have permission to change the users password'
+        fail ForbiddenError,
+             'You do not have permission to change the users password'
       when 404
-        fail 'User does not exist'
+        fail NotFoundError, 'User does not exist'
       when 500
-        fail 'Server failed to change the password'
+        fail InternalServerError, 'Server failed to change the password'
       else
         return false
       end
@@ -152,11 +159,11 @@ module Nessus6
       when 200
         return JSON.parse response.body
       when 403
-        fail 'You do not have permission to generate API keys'
+        fail ForbiddenError, 'You do not have permission to generate API keys'
       when 404
-        fail 'User does not exist'
+        fail NotFoundError, 'User does not exist'
       when 500
-        fail 'Server failed to change the keys'
+        fail InternalServerError, 'Server failed to change the keys'
       else
         return false
       end
