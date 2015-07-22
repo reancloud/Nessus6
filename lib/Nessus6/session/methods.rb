@@ -3,6 +3,7 @@ require 'Nessus6/errors/bad_request'
 require 'Nessus6/errors/forbidden'
 require 'Nessus6/errors/internal_server_error'
 require 'Nessus6/errors/unauthorized'
+require 'Nessus6/errors/unknown'
 
 module Nessus6
   class Session
@@ -28,6 +29,9 @@ module Nessus6
         return true
       when 401
         fail 'No session exists'
+      else
+        fail UnknownError, 'An unknown error occurred. Please consult Nessus' \
+                           'for further details.'
       end
     end
 
@@ -72,7 +76,8 @@ module Nessus6
       when 500
         fail InternalServerError, 'Too many users are connected'
       else
-        return false
+        fail UnknownError, 'An unknown error occurred. Please consult Nessus' \
+                           'for further details.'
       end
     end
 
@@ -86,7 +91,8 @@ module Nessus6
       when 500
         fail InternalServerError, 'Server failed to edit the user'
       else
-        return false
+        fail UnknownError, 'An unknown error occurred. Please consult Nessus' \
+                           'for further details.'
       end
     end
 
@@ -98,7 +104,8 @@ module Nessus6
         fail ForbiddenError,
              'You do not have permission to view the session data'
       else
-        return false
+        fail UnknownError, 'An unknown error occurred. Please consult Nessus' \
+                           'for further details.'
       end
     end
 
@@ -114,7 +121,8 @@ module Nessus6
       when 500
         fail InternalServerError, 'Server failed to change the password'
       else
-        return false
+        fail UnknownError, 'An unknown error occurred. Please consult Nessus' \
+                           'for further details.'
       end
     end
 
@@ -126,7 +134,8 @@ module Nessus6
         fail UnauthorizedError,
              'You are not logged in / authenticated'
       else
-        return false
+        fail UnknownError, 'An unknown error occurred. Please consult Nessus' \
+                           'for further details.'
       end
     end
   end

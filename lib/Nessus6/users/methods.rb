@@ -4,6 +4,7 @@ require 'Nessus6/errors/conflict'
 require 'Nessus6/errors/forbidden'
 require 'Nessus6/errors/internal_server_error'
 require 'Nessus6/errors/not_found'
+require 'Nessus6/errors/unknown'
 
 module Nessus6
   class Users
@@ -75,7 +76,8 @@ module Nessus6
       when 409
         fail ConflictError, 'User already exists'
       else
-        return false
+        fail UnknownError, 'An unknown error occurred. Please consult Nessus' \
+                           'for further details.'
       end
     end
 
@@ -93,7 +95,8 @@ module Nessus6
         fail InternalServerError,
              'Failed to delete the user due to an interal server error'
       else
-        return false
+        fail UnknownError, 'An unknown error occurred. Please consult Nessus' \
+                           'for further details.'
       end
     end
 
@@ -110,7 +113,8 @@ module Nessus6
       when 409
         fail ConflictError, 'Cannot edit your own permissions'
       else
-        return false
+        fail UnknownError, 'An unknown error occurred. Please consult Nessus' \
+                           'for further details.'
       end
     end
 
@@ -121,7 +125,8 @@ module Nessus6
       when 404
         fail NotFoundError, 'User does not exist'
       else
-        return false
+        fail UnknownError, 'An unknown error occurred. Please consult Nessus' \
+                           'for further details.'
       end
     end
 
@@ -132,7 +137,8 @@ module Nessus6
       when 403
         fail ForbiddenError, 'You do not have permission to view the list'
       else
-        return false
+        fail UnknownError, 'An unknown error occurred. Please consult Nessus' \
+                           'for further details.'
       end
     end
 
@@ -150,7 +156,8 @@ module Nessus6
       when 500
         fail InternalServerError, 'Server failed to change the password'
       else
-        return false
+        fail UnknownError, 'An unknown error occurred. Please consult Nessus' \
+                           'for further details.'
       end
     end
 
@@ -165,7 +172,8 @@ module Nessus6
       when 500
         fail InternalServerError, 'Server failed to change the keys'
       else
-        return false
+        fail UnknownError, 'An unknown error occurred. Please consult Nessus' \
+                           'for further details.'
       end
     end
   end
