@@ -5,6 +5,7 @@ require 'Nessus6/session/methods'
 require 'Nessus6/users/methods'
 require 'Nessus6/file/methods'
 require 'Nessus6/folders/methods'
+require 'Nessus6/groups/methods'
 
 module Nessus6
   # The Client class is used to interact with the Nessus API
@@ -51,6 +52,7 @@ module Nessus6
       @users = Nessus6::Users.new client
       @file = Nessus6::File.new client
       @folders = Nessus6::Folders.new client
+      @folders = Nessus6::Groups.new client
     end
   end
 end
