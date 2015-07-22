@@ -4,11 +4,12 @@ require 'Nessus6/editor/methods'
 require 'Nessus6/session/methods'
 require 'Nessus6/users/methods'
 require 'Nessus6/file/methods'
+require 'Nessus6/folders/methods'
 
 module Nessus6
   # The Client class is used to interact with the Nessus API
   class Client
-    attr_reader :client, :editor, :session, :users, :file
+    attr_reader :client, :editor, :session, :users, :file, :folders
 
     def initialize(credentials, nessus)
       nessus[:port] = '8834' unless nessus.key?(:port)
@@ -49,6 +50,7 @@ module Nessus6
       @editor = Nessus6::Editor.new client
       @users = Nessus6::Users.new client
       @file = Nessus6::File.new client
+      @folders = Nessus6::Folders.new client
     end
   end
 end
