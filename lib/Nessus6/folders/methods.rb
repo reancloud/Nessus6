@@ -27,7 +27,7 @@ module Nessus6
       verify_edit response
     end
 
-    alias_method :edit, :rename
+    alias_method :rename, :edit
 
     def list
       response = @client.get('folders')
