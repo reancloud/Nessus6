@@ -1,4 +1,4 @@
-[![Code Climate](https://codeclimate.com/github/kkirsche/Nessus6/badges/gpa.svg)](https://codeclimate.com/github/kkirsche/Nessus6)
+[![Code Climate](https://codeclimate.com/github/kkirsche/Nessus6/badges/gpa.svg)](https://codeclimate.com/github/kkirsche/Nessus6) [![Test Coverage](https://codeclimate.com/github/kkirsche/Nessus6/badges/coverage.svg)](https://codeclimate.com/github/kkirsche/Nessus6/coverage)
 
 # Nessus6
 
