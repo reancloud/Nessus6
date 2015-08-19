@@ -1,4 +1,7 @@
 require 'hurley'
+# Must go first
+require 'Nessus6/verification/methods'
+# Inherits from verification
 require 'Nessus6/version'
 require 'Nessus6/editor/methods'
 require 'Nessus6/session/methods'
