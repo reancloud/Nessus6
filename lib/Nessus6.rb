@@ -1,16 +1,16 @@
 require 'hurley'
 # Must go first
-require 'Nessus6/verification/methods'
+require 'Nessus6/verification'
 # Inherits from verification
 require 'Nessus6/version'
-require 'Nessus6/editor/methods'
-require 'Nessus6/session/methods'
-require 'Nessus6/users/methods'
-require 'Nessus6/file/methods'
-require 'Nessus6/folders/methods'
-require 'Nessus6/groups/methods'
-require 'Nessus6/permissions/methods'
-require 'Nessus6/scans/methods'
+require 'Nessus6/editor'
+require 'Nessus6/session'
+require 'Nessus6/users'
+require 'Nessus6/file'
+require 'Nessus6/folders'
+require 'Nessus6/groups'
+require 'Nessus6/permissions'
+require 'Nessus6/scans'
 require 'Nessus6/errors/authentication_error'
 
 module Nessus6

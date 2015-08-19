@@ -33,6 +33,10 @@ module Nessus6Test
       expect(@client.editor).must_be_instance_of Nessus6::Editor
     end
 
+    it 'should have a editor client' do
+      expect(@client.users).must_be_instance_of Nessus6::Users
+    end
+
     it 'should have a session token' do
       expect(@client.client.header['X-Cookie']).must_equal 'token = test_token'
     end
