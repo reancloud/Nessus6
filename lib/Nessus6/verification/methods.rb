@@ -1,6 +1,6 @@
 module Nessus6
   # The verification class allows methods to verify responses from Nessus
-  class Verification
+  module Verification
     private
 
     def verify(response, message = nil)
