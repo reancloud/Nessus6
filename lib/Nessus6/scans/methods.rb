@@ -6,10 +6,58 @@ require 'Nessus6/errors/internal_server_error' # 500
 require 'Nessus6/errors/unknown'
 
 module Nessus6
-  # The Editor class is for interacting with Nessus6 templates
+  # The Scans class is for interacting with Nessus6 scans.
+  # https://localhost:8834/api#/resources/scans
   class Scans
     def initialize(client)
       @client = client
+    end
+
+    # Copies the given scan. Requires can configure scan permissions
+    #
+    # @param scan_id [String, Fixnum] The id of the scan to export.
+    # @param query_params [Hash] Includes:
+    #   :folder_id [String, Fixnum] - The id of the destination folder.
+    #   :history [TrueClass, FalseClass, String] - If true, the history for
+    #     the scan will be copied
+    #   :name [String] - The name of the copied scan
+    # @return [Hash]
+    def copy(scan_id, query_params = nil)
+      if query_params.is_a? Hash
+        response = @client.post "scans/#{scan_id}/copy", query_params
+      else
+        response = @client.post "scans/#{scan_id}/copy"
+      end
+
+      verify response,
+             not_found: 'Scan does not exist.',
+             internal_server_error: 'An error occurred while copying.'
+    end
+
+    # Deletes a scan. NOTE: Scans in running, paused or stopping states can not
+    # be deleted. This request requires can configure scan permissions
+    #
+    # @param scan_id [String, Fixnum] The id of the scan to delete.
+    # @return [Hash] The scan UUID or throws an error
+    def delete(scan_id)
+      response = @client.delete "scans/#{scan_id}"
+      verify response,
+             internal_server_error: 'Failed to delete the scan. This may be ' \
+                                    'because the scan is currently running'
+    end
+
+    # Deletes historical results from a scan. This request requires can
+    # configure scan permissions.
+    #
+    # @param scan_id [String, Fixnum] The id of the scan.
+    # @param query_params [Hash] Includes:
+    #   :history_id [String, Fixnum] - The id of the results to delete.
+    # @return [Hash] The scan UUID or throws an error
+    def delete_history(scan_id, query_params = nil)
+      response = @client.delete "scans/#{scan_id}"
+      verify response,
+             not_found: 'Results were not found.',
+             internal_server_error: 'Failed to delete the results.'
     end
 
     # Launches a scan.
@@ -27,7 +75,11 @@ module Nessus6
         response = @client.post "scans/#{scan_id}/launch"
       end
 
-      verify_launch response
+      verify response,
+             forbidden: 'This scan is disabled.',
+             not_found: 'Scan does not exist.',
+             internal_server_error: 'Failed to launch scan. This is usually '\
+                                    'due to the scan already running.'
     end
 
     # Returns the scan list.
@@ -44,7 +96,9 @@ module Nessus6
     # @return [Hash] The scan UUID or throws an error
     def pause(scan_id)
       response = @client.post "scans/#{scan_id}/pause"
-      verify_pause response
+      verify response,
+             forbidden: 'This scan is disabled.',
+             conflict: 'Scan is not active.'
     end
 
     # Stops a scan.
@@ -53,53 +107,33 @@ module Nessus6
     # @return [Hash] The scan UUID or throws an error
     def stop(scan_id)
       response = @client.post "scans/#{scan_id}/stop"
-      verify_stop response
+      verify response,
+             not_found: 'Scan does not exist.',
+             conflict: 'Scan is not active.'
     end
 
     private
 
-    def verify_launch(response)
+    def verify(response, message = nil)
       case response.status_code
       when 200
         return JSON.parse response.body
+      when 400
+        fail Nessus6::Error::BadRequestError, "#{message[:bad_request]}"
+      when 401
+        fail Nessus6::Error::UnauthorizedError, "#{message[:unauthorized]}"
       when 403
-        fail ForbiddenError, 'This scan is disabled.'
+        fail Nessus6::Error::ForbiddenError, "#{message[:forbidden]}"
       when 404
-        fail NotFoundError, 'Scan does not exist.'
+        fail Nessus6::Error::NotFoundError, "#{message[:not_found]}"
+      when 409
+        fail Nessus6::Error::ConflictError, "#{message[:conflict]}"
       when 500
-        fail InternalServerError, 'Failed to launch scan. This is usually due to the'\
-          ' scan already running.'
+        fail Nessus6::Error::InternalServerError,
+             "#{message[:internal_server_error]}"
       else
-        fail UnknownError, 'An unknown error occurred. Please consult Nessus' \
-                           'for further details.'
-      end
-    end
-
-    def verify_pause(response)
-      case response.status_code
-      when 200
-        return JSON.parse response.body
-      when 403
-        fail ForbiddenError, 'This scan is disabled.'
-      when 409
-        fail ConflictError, 'Scan is not active.'
-      else
-        fail UnknownError, 'An unknown error occurred. Please consult Nessus' \
-                           'for further details.'
-      end
-    end
-
-    def verify_stop(response)
-      case response.status_code
-      when 200
-        return JSON.parse response.body
-      when 404
-        fail NotFoundError, 'Scan does not exist.'
-      when 409
-        fail ConflictError, 'Scan is not active.'
-      else
-        fail UnknownError, 'An unknown error occurred. Please consult Nessus' \
-                           'for further details.'
+        fail Nessus6::Error::UnknownError, 'An unknown error occurred. ' \
+                           'Please consult Nessus for further details.'
       end
     end
   end

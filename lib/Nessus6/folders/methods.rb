@@ -6,7 +6,9 @@ require 'Nessus6/errors/not_found'
 require 'Nessus6/errors/unknown'
 
 module Nessus6
-  # The Editor class is for interacting with Nessus6 templates
+  # The Folders class is for interacting with Nessus6 folders. Folders are used
+  # to sort and organize a user's scan results.
+  # https://localhost:8834/api#/resources/folders
   class Folders
     def initialize(client)
       @client = client
@@ -19,7 +21,10 @@ module Nessus6
     # @return [Hash]
     def create(name)
       response = @client.post('folders', name: name)
-      verify_create response
+      verify response,
+             bad_request: 'Folder name is invalid',
+             forbidden: 'You do not have permission to create a folder.',
+             internal_server_error: 'Server failed to create the folder.'
     end
 
     # Deletes a folder. This request requires read-only user permissions.
@@ -28,7 +33,10 @@ module Nessus6
     # @return [Hash]
     def delete(folder_id)
       response = @client.delete("folders/#{folder_id}")
-      verify_delete response
+      verify response,
+             forbidden: 'Cannot delete a system folder.',
+             not_found: 'Folder does not exist.',
+             internal_server_error: 'Server failed to delete the folder.'
     end
 
     # Rename a folder for the current user. This request requires read-only
@@ -39,7 +47,10 @@ module Nessus6
     # @return [Hash]
     def edit(folder_id, name)
       response = @client.put("folders/#{folder_id}", name: name)
-      verify_edit response
+      verify response,
+             forbidden: 'Cannot rename a system folder.',
+             not_found: 'Folder does not exist.',
+             internal_server_error: 'Server failed to rename the folder.'
     end
 
     alias_method :rename, :edit
@@ -49,69 +60,33 @@ module Nessus6
     # @return [Hash] { "folders": [folder Resource] }
     def list
       response = @client.get('folders')
-      verify_list response
+      verify response,
+             forbidden: 'You do not have permission to view the folder list.',
+             internal_server_error: 'An internal server error occurred.'
     end
 
     private
 
-    def verify_create(response)
+    def verify(response, message = nil)
       case response.status_code
       when 200
         return JSON.parse response.body
       when 400
-        fail BadRequestError, 'Folder name is invalid'
+        fail Nessus6::Error::BadRequestError, "#{message[:bad_request]}"
+      when 401
+        fail Nessus6::Error::UnauthorizedError, "#{message[:unauthorized]}"
       when 403
-        fail ForbiddenError, 'You do not have permission to create a folder'
-      when 500
-        fail InternalServerError, 'Server failed to create the folder'
-      else
-        fail UnknownError, 'An unknown error occurred. Please consult Nessus' \
-                           'for further details.'
-      end
-    end
-
-    def verify_delete(response)
-      case response.status_code
-      when 200
-        return JSON.parse response.body
-      when 403
-        fail ForbiddenError, 'Cannot delete a system folder'
+        fail Nessus6::Error::ForbiddenError, "#{message[:forbidden]}"
       when 404
-        fail NotFoundError, 'Folder does not exist'
+        fail Nessus6::Error::NotFoundError, "#{message[:not_found]}"
+      when 409
+        fail Nessus6::Error::ConflictError, "#{message[:conflict]}"
       when 500
-        fail InternalServerError, 'Server failed to delete the folder'
+        fail Nessus6::Error::InternalServerError,
+             "#{message[:internal_server_error]}"
       else
-        fail UnknownError, 'An unknown error occurred. Please consult Nessus' \
-                           'for further details.'
-      end
-    end
-
-    def verify_edit(response)
-      case response.status_code
-      when 200
-        return JSON.parse response.body
-      when 403
-        fail ForbiddenError, 'Cannot rename a system folder'
-      when 404
-        fail NotFoundError, 'Folder does not exist'
-      when 500
-        fail InternalServerError, 'Server failed to rename the folder'
-      else
-        fail UnknownError, 'An unknown error occurred. Please consult Nessus' \
-                           'for further details.'
-      end
-    end
-
-    def verify_list(response)
-      case response.status_code
-      when 200
-        return JSON.parse response.body
-      when 403
-        fail ForbiddenError,
-             'You do not have permission to view the folder list'
-      else
-        fail UnknownError, 'An unknown error occurred. Please consult Nessus' \
-                           'for further details.'
+        fail Nessus6::Error::UnknownError, 'An unknown error occurred. ' \
+                           'Please consult Nessus for further details.'
       end
     end
   end

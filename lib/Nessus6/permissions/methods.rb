@@ -4,7 +4,9 @@ require 'Nessus6/errors/not_found' # 404
 require 'Nessus6/errors/unknown'
 
 module Nessus6
-  # The Editor class is for interacting with Nessus6 templates
+  # The Permissions class is for interacting with Nessus6 user permissions.
+  # Permissions are used to provide access rights to a given object.
+  # https://localhost:8834/api#/resources/permissions
   class Permissions
     def initialize(client)
       @client = client
@@ -20,7 +22,9 @@ module Nessus6
     def change(object_type, object_id, permissions)
       response = @client.put("permissions/#{object_type}/#{object_id}",
                              body: permissions)
-      verify_change response
+      verify response,
+             forbidden: 'You do not have permission to edit the object',
+             not_found: 'Object does not exist'
     end
 
     # Returns the current object's permissions.
@@ -30,36 +34,33 @@ module Nessus6
     # @return [Hash]
     def list(object_type, object_id)
       response = @client.get("permissions/#{object_type}/#{object_id}")
-      verify_list response
+      verify response,
+             forbidden: 'You do not have permission to view the object',
+             not_found: 'Object does not exist'
     end
 
     private
 
-    def verify_change(response)
+    def verify(response, message = nil)
       case response.status_code
       when 200
         return JSON.parse response.body
+      when 400
+        fail Nessus6::Error::BadRequestError, "#{message[:bad_request]}"
+      when 401
+        fail Nessus6::Error::UnauthorizedError, "#{message[:unauthorized]}"
       when 403
-        fail ForbiddenError, 'You do not have permission to edit the object'
+        fail Nessus6::Error::ForbiddenError, "#{message[:forbidden]}"
       when 404
-        fail NotFoundError, 'Object does not exist'
+        fail Nessus6::Error::NotFoundError, "#{message[:not_found]}"
+      when 409
+        fail Nessus6::Error::ConflictError, "#{message[:conflict]}"
+      when 500
+        fail Nessus6::Error::InternalServerError,
+             "#{message[:internal_server_error]}"
       else
-        fail UnknownError, 'An unknown error occurred. Please consult Nessus' \
-                           'for further details.'
-      end
-    end
-
-    def verify_list(response)
-      case response.status_code
-      when 200
-        return JSON.parse response.body
-      when 403
-        fail ForbiddenError, 'You do not have permission to view the object'
-      when 404
-        fail NotFoundError, 'Object does not exist'
-      else
-        fail UnknownError, 'An unknown error occurred. Please consult Nessus' \
-                           'for further details.'
+        fail Nessus6::Error::UnknownError, 'An unknown error occurred. ' \
+                           'Please consult Nessus for further details.'
       end
     end
   end

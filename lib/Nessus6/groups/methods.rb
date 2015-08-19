@@ -6,7 +6,9 @@ require 'Nessus6/errors/not_found' # 404
 require 'Nessus6/errors/unknown'
 
 module Nessus6
-  # The Editor class is for interacting with Nessus6 templates
+  # The Groups class is for interacting with Nessus6 user groups. Groups are
+  # utilized to make sharing easier.
+  # https://localhost:8834/api#/resources/groups
   class Groups
     def initialize(client)
       @client = client
@@ -20,7 +22,10 @@ module Nessus6
     # @return [Hash]
     def add_user(group_id, user_id)
       response = @client.post("groups/#{group_id}/users/#{user_id}")
-      verify_add_user response
+      verify response,
+             forbidden: 'You do not have permission to add users to a group',
+             not_found: 'Group or user does not exist',
+             internal_server_error: 'Server failed to add the user to the group'
     end
 
     # Create a group. This request requires administrator user
@@ -30,7 +35,10 @@ module Nessus6
     # @return [Hash]
     def create(name)
       response = @client.post('groups', name: name)
-      verify_create response
+      verify response,
+             bad_request: 'Field is invalid',
+             forbidden: 'You do not have permission to create a group',
+             internal_server_error: 'Server failed to create the group'
     end
 
     # Delete a group. This request requires administrator user
@@ -40,7 +48,10 @@ module Nessus6
     # @return [Hash]
     def delete(group_id)
       response = @client.delete("groups/#{group_id}")
-      verify_delete response
+      verify response,
+             bad_request: 'Group does not exist',
+             forbidden: 'You do not have permission to delete the group',
+             internal_server_error: 'Server failed to delete the group'
     end
 
     # Deletes a user from the group. This request requires administrator user
@@ -51,7 +62,12 @@ module Nessus6
     # @return [Hash]
     def delete_user(group_id, user_id)
       response = @client.delete("groups/#{group_id}/users/#{user_id}")
-      verify_delete_user response
+      verify response,
+             forbidden: 'You do not have permission to delete users from a '\
+                        'group',
+             not_found: 'Group or user does not exist',
+             internal_server_error: 'Server failed to remove the user from '\
+                                    'the group'
     end
 
     # Edit a group. This request requires administrator user permissions.
@@ -61,7 +77,11 @@ module Nessus6
     # @return [Hash]
     def edit(group_id, name)
       response = @client.put("groups/#{group_id}", name: name)
-      verify_edit response
+      verify response,
+             bad_request: 'Field is invalid',
+             forbidden: 'You do not have permission to edit a group',
+             not_found: 'Group does not exist',
+             internal_server_error: 'Server failed to edit / rename the group'
     end
 
     alias_method :rename, :edit
@@ -71,7 +91,8 @@ module Nessus6
     # @return [Hash]
     def list
       response = @client.get('groups')
-      verify_list response
+      verify response,
+             forbidden: 'You do not have permission to view the groups list'
     end
 
     # Return the group user list. This request requires administrator user
@@ -81,121 +102,34 @@ module Nessus6
     # @return [Hash]
     def list_users(group_id)
       response = @client.get("groups/#{group_id}/users")
-      verify_list_users response
+      verify response,
+             forbidden: 'You do not have permission to view the groups users '\
+                        'list',
+             not_found: 'Group does not exist'
     end
 
     private
 
-    def verify_add_user(response)
-      case response.status_code
-      when 200
-        return JSON.parse response.body
-      when 403
-        fail ForbiddenError,
-             'You do not have permission to add users to a group'
-      when 404
-        fail NotFoundError, 'Group or user does not exist'
-      when 500
-        fail InternalServerError, 'Server failed to add the user to the group'
-      else
-        fail UnknownError, 'An unknown error occurred. Please consult Nessus' \
-                           'for further details.'
-      end
-    end
-
-    def verify_create(response)
+    def verify(response, message = nil)
       case response.status_code
       when 200
         return JSON.parse response.body
       when 400
-        fail BadRequestError, 'Field is invalid'
+        fail Nessus6::Error::BadRequestError, "#{message[:bad_request]}"
+      when 401
+        fail Nessus6::Error::UnauthorizedError, "#{message[:unauthorized]}"
       when 403
-        fail ForbiddenError, 'You do not have permission to create a group'
-      when 500
-        fail InternalServerError, 'Server failed to create the group'
-      else
-        fail UnknownError, 'An unknown error occurred. Please consult Nessus' \
-                           'for further details.'
-      end
-    end
-
-    def verify_delete(response)
-      case response.status_code
-      when 200
-        return JSON.parse response.body
-      when 400
-        fail BadRequestError, 'Group does not exist'
-      when 403
-        fail ForbiddenError, 'You do not have permission to delete the group'
-      when 500
-        fail InternalServerError, 'Server failed to delete the group'
-      else
-        fail UnknownError, 'An unknown error occurred. Please consult Nessus' \
-                           'for further details.'
-      end
-    end
-
-    def verify_delete_user(response)
-      case response.status_code
-      when 200
-        return JSON.parse response.body
-      when 403
-        fail ForbiddenError,
-             'You do not have permission to delete users from a group'
+        fail Nessus6::Error::ForbiddenError, "#{message[:forbidden]}"
       when 404
-        fail NotFoundError, 'Group or user does not exist'
+        fail Nessus6::Error::NotFoundError, "#{message[:not_found]}"
+      when 409
+        fail Nessus6::Error::ConflictError, "#{message[:conflict]}"
       when 500
-        fail InternalServerError,
-             'Server failed to remove the user from the group'
+        fail Nessus6::Error::InternalServerError,
+             "#{message[:internal_server_error]}"
       else
-        fail UnknownError, 'An unknown error occurred. Please consult Nessus' \
-                           'for further details.'
-      end
-    end
-
-    def verify_edit(response)
-      case response.status_code
-      when 200
-        return JSON.parse response.body
-      when 400
-        fail BadRequestError, 'Field is invalid'
-      when 403
-        fail ForbiddenError, 'You do not have permission to edit a group'
-      when 404
-        fail NotFoundError, 'Group does not exist'
-      when 500
-        fail InternalServerError, 'Server failed to edit / rename the group'
-      else
-        fail UnknownError, 'An unknown error occurred. Please consult Nessus' \
-                           'for further details.'
-      end
-    end
-
-    def verify_list(response)
-      case response.status_code
-      when 200
-        return JSON.parse response.body
-      when 403
-        fail ForbiddenError,
-             'You do not have permission to view the groups list'
-      else
-        fail UnknownError, 'An unknown error occurred. Please consult Nessus' \
-                           'for further details.'
-      end
-    end
-
-    def verify_list_users(response)
-      case response.status_code
-      when 200
-        return JSON.parse response.body
-      when 403
-        fail ForbiddenError,
-             'You do not have permission to view the groups users list'
-      when 404
-        fail NotFoundError, 'Group does not exist'
-      else
-        fail UnknownError, 'An unknown error occurred. Please consult Nessus' \
-                           'for further details.'
+        fail Nessus6::Error::UnknownError, 'An unknown error occurred. ' \
+                           'Please consult Nessus for further details.'
       end
     end
   end
