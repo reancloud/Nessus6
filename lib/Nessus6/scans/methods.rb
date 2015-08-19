@@ -12,6 +12,13 @@ module Nessus6
       @client = client
     end
 
+    # Launches a scan.
+    #
+    # @param scan_id [String, Fixnum] The id of the scan to launch.
+    # @param alt_targets [Array] If specified, these targets will be scanned
+    #   instead of the default. Value can be an array where each index is a
+    #   target, or an array with a single index of comma separated targets.
+    # @return [Hash] The scan UUID or throws an error
     def launch(scan_id, alt_targets = nil)
       if alt_targets.is_a? Array
         response = @client.post "scans/#{scan_id}/launch",
@@ -23,16 +30,27 @@ module Nessus6
       verify_launch response
     end
 
+    # Returns the scan list.
+    #
+    # @return [Hash] Returns the scan list.
     def list
       response = @client.get 'scans'
       JSON.parse response.body
     end
 
+    # Pauses a scan.
+    #
+    # @param scan_id [String, Fixnum] The id of the scan to pause.
+    # @return [Hash] The scan UUID or throws an error
     def pause(scan_id)
       response = @client.post "scans/#{scan_id}/pause"
       verify_pause response
     end
 
+    # Stops a scan.
+    #
+    # @param scan_id [String, Fixnum] The id of the scan to stop.
+    # @return [Hash] The scan UUID or throws an error
     def stop(scan_id)
       response = @client.post "scans/#{scan_id}/stop"
       verify_stop response
