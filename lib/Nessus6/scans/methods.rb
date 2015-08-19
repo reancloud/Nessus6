@@ -33,6 +33,11 @@ module Nessus6
       verify_pause response
     end
 
+    def stop(scan_id)
+      response = @client.post "scans/#{scan_id}/stop"
+      verify_stop response
+    end
+
     private
 
     def verify_launch(response)
@@ -58,6 +63,20 @@ module Nessus6
         return JSON.parse response.body
       when 403
         fail ForbiddenError, 'This scan is disabled.'
+      when 409
+        fail ConflictError, 'Scan is not active.'
+      else
+        fail UnknownError, 'An unknown error occurred. Please consult Nessus' \
+                           'for further details.'
+      end
+    end
+
+    def verify_stop(response)
+      case response.status_code
+      when 200
+        return JSON.parse response.body
+      when 404
+        fail NotFoundError, 'Scan does not exist.'
       when 409
         fail ConflictError, 'Scan is not active.'
       else
