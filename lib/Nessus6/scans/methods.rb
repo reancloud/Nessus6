@@ -9,6 +9,10 @@ module Nessus6
   # The Scans class is for interacting with Nessus6 scans.
   # https://localhost:8834/api#/resources/scans
   class Scans
+    include Nessus6::Verification
+
+    public
+
     def initialize(client)
       @client = client
     end
@@ -58,6 +62,22 @@ module Nessus6
       verify response,
              not_found: 'Results were not found.',
              internal_server_error: 'Failed to delete the results.'
+    end
+
+    # Returns details for the given scan. This request requires can view
+    # scan permissions
+    #
+    # @param scan_id [String, Fixnum] The id of the scan to retrieve
+    # @param history_id [String, Fixnum] The history_id of the historical data
+    #   that should be returned.
+    # @return [Hash] The scan details
+    def details(scan_id, history_id = nil)
+      if history_id.nil?
+        response = @client.get("scans/#{scan_id}")
+      else
+        response = @client.get("scans/#{scan_id}", history_id: history_id)
+      end
+      JSON.parse response.body
     end
 
     # Launches a scan.
@@ -110,31 +130,6 @@ module Nessus6
       verify response,
              not_found: 'Scan does not exist.',
              conflict: 'Scan is not active.'
-    end
-
-    private
-
-    def verify(response, message = nil)
-      case response.status_code
-      when 200
-        return JSON.parse response.body
-      when 400
-        fail Nessus6::Error::BadRequestError, "#{message[:bad_request]}"
-      when 401
-        fail Nessus6::Error::UnauthorizedError, "#{message[:unauthorized]}"
-      when 403
-        fail Nessus6::Error::ForbiddenError, "#{message[:forbidden]}"
-      when 404
-        fail Nessus6::Error::NotFoundError, "#{message[:not_found]}"
-      when 409
-        fail Nessus6::Error::ConflictError, "#{message[:conflict]}"
-      when 500
-        fail Nessus6::Error::InternalServerError,
-             "#{message[:internal_server_error]}"
-      else
-        fail Nessus6::Error::UnknownError, 'An unknown error occurred. ' \
-                           'Please consult Nessus for further details.'
-      end
     end
   end
 end

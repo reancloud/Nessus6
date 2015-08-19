@@ -11,6 +11,10 @@ module Nessus6
   # used to create scans or policies with predefined parameters.
   # https://localhost:8834/api#/resources/editor
   class Editor
+    include Nessus6::Verification
+
+    public
+
     def initialize(client)
       @client = client
     end
@@ -79,31 +83,6 @@ module Nessus6
       response = @client.get("editor/policy/#{policy_id}/families/#{family_id}/plugins/#{plugin_id}")
       verify response,
              internal_server_error: 'Internal server error occurred.'
-    end
-
-    private
-
-    def verify(response, message = nil)
-      case response.status_code
-      when 200
-        return JSON.parse response.body
-      when 400
-        fail Nessus6::Error::BadRequestError, "#{message[:bad_request]}"
-      when 401
-        fail Nessus6::Error::UnauthorizedError, "#{message[:unauthorized]}"
-      when 403
-        fail Nessus6::Error::ForbiddenError, "#{message[:forbidden]}"
-      when 404
-        fail Nessus6::Error::NotFoundError, "#{message[:not_found]}"
-      when 409
-        fail Nessus6::Error::ConflictError, "#{message[:conflict]}"
-      when 500
-        fail Nessus6::Error::InternalServerError,
-             "#{message[:internal_server_error]}"
-      else
-        fail Nessus6::Error::UnknownError, 'An unknown error occurred. ' \
-                           'Please consult Nessus for further details.'
-      end
     end
   end
 end
