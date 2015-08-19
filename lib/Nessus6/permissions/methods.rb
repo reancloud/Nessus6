@@ -10,12 +10,24 @@ module Nessus6
       @client = client
     end
 
+    # Changes the permissions for an object.
+    #
+    # @param object_type [String] The type of object.
+    # @param object_id [String, Fixnum] The unique id of the object.
+    # @param permissions [String] An array of permission resources to apply
+    #   to the object.
+    # @return [Hash]
     def change(object_type, object_id, permissions)
       response = @client.put("permissions/#{object_type}/#{object_id}",
                              body: permissions)
       verify_change response
     end
 
+    # Returns the current object's permissions.
+    #
+    # @param object_type [String] The type of object.
+    # @param object_id [String, Fixnum] The unique id of the object.
+    # @return [Hash]
     def list(object_type, object_id)
       response = @client.get("permissions/#{object_type}/#{object_id}")
       verify_list response
