@@ -8,6 +8,7 @@ Gem::Specification.new do |spec|
   spec.version       = Nessus6::VERSION
   spec.authors       = ["Kevin Kirsche"]
   spec.email         = ["kev.kirsche@gmail.com"]
+  spec.license       = 'Apache-2.0'
 
   spec.summary       = %q{[Under Construction] Nessus 6 API Gem}
   spec.description   = %q{Gem for interacting with the Tenable Nessus 6 REST API.}
