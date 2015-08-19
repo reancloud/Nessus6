@@ -10,7 +10,7 @@ module Nessus6
   # The Users class allows us to interact with Nessus 6 users.
   # Users can utilize Nessus based on their given role.
   # https://localhost:8834/api#/resources/users
-  class Users
+  class User
     include Nessus6::Verification
 
     public

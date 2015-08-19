@@ -9,7 +9,7 @@ module Nessus6
   # The Groups class is for interacting with Nessus6 user groups. Groups are
   # utilized to make sharing easier.
   # https://localhost:8834/api#/resources/groups
-  class Groups
+  class Group
     include Nessus6::Verification
 
     public

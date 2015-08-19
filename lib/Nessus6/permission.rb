@@ -7,7 +7,7 @@ module Nessus6
   # The Permissions class is for interacting with Nessus6 user permissions.
   # Permissions are used to provide access rights to a given object.
   # https://localhost:8834/api#/resources/permissions
-  class Permissions
+  class Permission
     include Nessus6::Verification
 
     public

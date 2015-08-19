@@ -8,7 +8,7 @@ require 'Nessus6/errors/unknown'
 module Nessus6
   # The Scans class is for interacting with Nessus6 scans.
   # https://localhost:8834/api#/resources/scans
-  class Scans
+  class Scan
     include Nessus6::Verification
 
     public

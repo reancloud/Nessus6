@@ -5,19 +5,19 @@ require 'Nessus6/verification'
 require 'Nessus6/version'
 require 'Nessus6/editor'
 require 'Nessus6/session'
-require 'Nessus6/users'
+require 'Nessus6/user'
 require 'Nessus6/file'
-require 'Nessus6/folders'
-require 'Nessus6/groups'
-require 'Nessus6/permissions'
-require 'Nessus6/scans'
+require 'Nessus6/folder'
+require 'Nessus6/group'
+require 'Nessus6/permission'
+require 'Nessus6/scan'
 require 'Nessus6/errors/authentication_error'
 
 module Nessus6
   # The Client class is used to interact with the Nessus API
   class Client
-    attr_reader :client, :editor, :session, :users, :file, :folders, :groups,
-                :permissions, :scans
+    attr_reader :client, :editor, :session, :user, :file, :folder, :group,
+                :permission, :scan
 
     def initialize(credentials, nessus)
       nessus[:port] = '8834' unless nessus.key?(:port)
@@ -56,12 +56,12 @@ module Nessus6
     def build_clients(client)
       @session = Nessus6::Session.new client
       @editor = Nessus6::Editor.new client
-      @users = Nessus6::Users.new client
+      @user = Nessus6::User.new client
       @file = Nessus6::File.new client
-      @folders = Nessus6::Folders.new client
-      @groups = Nessus6::Groups.new client
-      @permissions = Nessus6::Permissions.new client
-      @scans = Nessus6::Scans.new client
+      @folder = Nessus6::Folder.new client
+      @group = Nessus6::Group.new client
+      @permission = Nessus6::Permission.new client
+      @scan = Nessus6::Scan.new client
     end
   end
 end

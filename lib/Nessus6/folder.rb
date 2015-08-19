@@ -9,7 +9,7 @@ module Nessus6
   # The Folders class is for interacting with Nessus6 folders. Folders are used
   # to sort and organize a user's scan results.
   # https://localhost:8834/api#/resources/folders
-  class Folders
+  class Folder
     include Nessus6::Verification
 
     public

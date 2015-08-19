@@ -33,8 +33,28 @@ module Nessus6Test
       expect(@client.editor).must_be_instance_of Nessus6::Editor
     end
 
-    it 'should have a editor client' do
-      expect(@client.users).must_be_instance_of Nessus6::Users
+    it 'should have a user client' do
+      expect(@client.user).must_be_instance_of Nessus6::User
+    end
+
+    it 'should have a file client' do
+      expect(@client.file).must_be_instance_of Nessus6::File
+    end
+
+    it 'should have a folder client' do
+      expect(@client.folder).must_be_instance_of Nessus6::Folder
+    end
+
+    it 'should have a group client' do
+      expect(@client.group).must_be_instance_of Nessus6::Group
+    end
+
+    it 'should have a permission client' do
+      expect(@client.permission).must_be_instance_of Nessus6::Permission
+    end
+
+    it 'should have a scan client' do
+      expect(@client.scan).must_be_instance_of Nessus6::Scan
     end
 
     it 'should have a session token' do
