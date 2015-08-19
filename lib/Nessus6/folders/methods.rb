@@ -12,16 +12,31 @@ module Nessus6
       @client = client
     end
 
+    # Creates a new folder for the current user. This request requires
+    # read-only user permissions.
+    #
+    # @param name [String] The name of the folder.
+    # @return [Hash]
     def create(name)
       response = @client.post('folders', name: name)
       verify_create response
     end
 
+    # Deletes a folder. This request requires read-only user permissions.
+    #
+    # @param folder_id [String, Fixnum] The id of the folder to delete.
+    # @return [Hash]
     def delete(folder_id)
       response = @client.delete("folders/#{folder_id}")
       verify_delete response
     end
 
+    # Rename a folder for the current user. This request requires read-only
+    # user permissions.
+    #
+    # @param folder_id [String, Fixnum] The id of the folder to edit.
+    # @param name [String] The name of the folder.
+    # @return [Hash]
     def edit(folder_id, name)
       response = @client.put("folders/#{folder_id}", name: name)
       verify_edit response
@@ -29,6 +44,9 @@ module Nessus6
 
     alias_method :rename, :edit
 
+    # Returns the current user's scan folders.
+    #
+    # @return [Hash] { "folders": [folder Resource] }
     def list
       response = @client.get('folders')
       verify_list response
