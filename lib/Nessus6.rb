@@ -8,6 +8,8 @@ require 'Nessus6/folders/methods'
 require 'Nessus6/groups/methods'
 require 'Nessus6/permissions/methods'
 require 'Nessus6/scans/methods'
+require 'Nessus6/errors/authentication_error'
+
 
 module Nessus6
   # The Client class is used to interact with the Nessus API
@@ -37,9 +39,9 @@ module Nessus6
         @client.header['X-Cookie'] = "token = #{@token}"
       elsif credentials[:access_key] && credentials[:secret_key]
       else
-        fail AuthenticationError, 'Authentication credentials not provided. ' \
-          'Must provided either username and password or access key and' \
-          ' secret key.'
+        fail Nessus6::Error::AuthenticationError, 'Authentication credentials' \
+          ' not provided. Must provided either username and password or ' \
+          'access key and secret key.'
       end
     end
 
