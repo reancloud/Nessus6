@@ -12,26 +12,53 @@ module Nessus6
       @client = client
     end
 
+    # Add a user to the group. This request requires administrator user
+    # permissions.
+    #
+    # @param group_id [String, Fixnum] The unique id of the group.
+    # @param user_id [String, Fixnum] The unique id of the user.
+    # @return [Hash]
     def add_user(group_id, user_id)
       response = @client.post("groups/#{group_id}/users/#{user_id}")
       verify_add_user response
     end
 
+    # Create a group. This request requires administrator user
+    # permissions.
+    #
+    # @param name [String, Fixnum] The name of the group.
+    # @return [Hash]
     def create(name)
       response = @client.post('groups', name: name)
       verify_create response
     end
 
+    # Delete a group. This request requires administrator user
+    # permissions.
+    #
+    # @param group_id [String, Fixnum] The unique id of the group.
+    # @return [Hash]
     def delete(group_id)
       response = @client.delete("groups/#{group_id}")
       verify_delete response
     end
 
+    # Deletes a user from the group. This request requires administrator user
+    # permissions.
+    #
+    # @param group_id [String, Fixnum] The unique id of the group.
+    # @param user_id [String, Fixnum] The unique id of the user.
+    # @return [Hash]
     def delete_user(group_id, user_id)
       response = @client.delete("groups/#{group_id}/users/#{user_id}")
       verify_delete_user response
     end
 
+    # Edit a group. This request requires administrator user permissions.
+    #
+    # @param group_id [String, Fixnum] The unique id of the group.
+    # @param name [String] The name of the group.
+    # @return [Hash]
     def edit(group_id, name)
       response = @client.put("groups/#{group_id}", name: name)
       verify_edit response
@@ -39,11 +66,19 @@ module Nessus6
 
     alias_method :rename, :edit
 
+    # Returns the group list. This request requires read-only user permissions.
+    #
+    # @return [Hash]
     def list
       response = @client.get('groups')
       verify_list response
     end
 
+    # Return the group user list. This request requires administrator user
+    # permissions.
+    #
+    # @param group_id [String, Fixnum] The unique id of the group.
+    # @return [Hash]
     def list_users(group_id)
       response = @client.get("groups/#{group_id}/users")
       verify_list_users response
