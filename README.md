@@ -1,4 +1,4 @@
-[![Code Climate](https://codeclimate.com/github/kkirsche/Nessus6/badges/gpa.svg)](https://codeclimate.com/github/kkirsche/Nessus6) [![Test Coverage](https://codeclimate.com/github/kkirsche/Nessus6/badges/coverage.svg)](https://codeclimate.com/github/kkirsche/Nessus6/coverage) [![Gem Version](https://badge.fury.io/rb/Nessus6.svg)](http://badge.fury.io/rb/Nessus6)
+[![Build Status](https://travis-ci.org/kkirsche/Nessus6.svg)](https://travis-ci.org/kkirsche/Nessus6) [![Code Climate](https://codeclimate.com/github/kkirsche/Nessus6/badges/gpa.svg)](https://codeclimate.com/github/kkirsche/Nessus6) [![Test Coverage](https://codeclimate.com/github/kkirsche/Nessus6/badges/coverage.svg)](https://codeclimate.com/github/kkirsche/Nessus6/coverage) [![Gem Version](https://badge.fury.io/rb/Nessus6.svg)](http://badge.fury.io/rb/Nessus6)
 
 # Nessus6
 
