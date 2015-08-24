@@ -18,7 +18,8 @@ module Nessus6
       response = @client.get('plugins/families')
       verify response,
              forbidden: 'You do not have permission to view plugin families',
-             internal_server_error: 'Server failed to create the group'
+             internal_server_error: 'Server failed to retrieve the plugin '\
+                                    'family list.'
     end
 
     # Returns the list of plugins in a family. This request requires standard
@@ -31,7 +32,8 @@ module Nessus6
       verify response,
              forbidden: 'You do not have permission to view the plugin family',
              not_found: 'Plugin family not found',
-             internal_server_error: 'Server failed to create the group'
+             internal_server_error: 'Server failed to retrieve the plugin '\
+                                    'family details.'
     end
 
     # Returns the details for a given plugin. This request requires standard
@@ -44,7 +46,8 @@ module Nessus6
       verify response,
              forbidden: 'You do not have permission to view the plugin',
              not_found: 'Plugin not found',
-             internal_server_error: 'Server failed to create the group'
+             internal_server_error: 'Server failed to retrieve the plugin '\
+                                    'details.'
     end
   end
 end
