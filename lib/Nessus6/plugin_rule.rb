@@ -1,7 +1,7 @@
 module Nessus6
   # The Plugin class is for interacting with Nessus6 plugins.
   # https://localhost:8834/api#/resources/plugins
-  class PluginRules
+  class PluginRule
     include Nessus6::Verification
 
     public
