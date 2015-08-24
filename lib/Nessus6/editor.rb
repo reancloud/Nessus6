@@ -1,11 +1,3 @@
-require 'json'
-require 'Nessus6/errors/bad_request' # 400
-require 'Nessus6/errors/forbidden' # 403
-require 'Nessus6/errors/not_found' # 404
-require 'Nessus6/errors/conflict' # 409
-require 'Nessus6/errors/internal_server_error' # 500
-require 'Nessus6/errors/unknown' # Unknown Error Code
-
 module Nessus6
   # The Editor class is for interacting with Nessus6 templates. Templates are
   # used to create scans or policies with predefined parameters.

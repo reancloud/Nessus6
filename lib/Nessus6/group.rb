@@ -1,10 +1,3 @@
-require 'json'
-require 'Nessus6/errors/internal_server_error' # 500
-require 'Nessus6/errors/forbidden' # 403
-require 'Nessus6/errors/bad_request' # 400
-require 'Nessus6/errors/not_found' # 404
-require 'Nessus6/errors/unknown'
-
 module Nessus6
   # The Groups class is for interacting with Nessus6 user groups. Groups are
   # utilized to make sharing easier.

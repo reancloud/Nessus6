@@ -1,8 +1,3 @@
-require 'json'
-require 'Nessus6/errors/forbidden' # 403
-require 'Nessus6/errors/not_found' # 404
-require 'Nessus6/errors/unknown'
-
 module Nessus6
   # The Permissions class is for interacting with Nessus6 user permissions.
   # Permissions are used to provide access rights to a given object.

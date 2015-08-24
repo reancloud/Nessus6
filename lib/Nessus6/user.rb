@@ -1,11 +1,3 @@
-require 'json'
-require 'Nessus6/errors/bad_request'
-require 'Nessus6/errors/conflict'
-require 'Nessus6/errors/forbidden'
-require 'Nessus6/errors/internal_server_error'
-require 'Nessus6/errors/not_found'
-require 'Nessus6/errors/unknown'
-
 module Nessus6
   # The Users class allows us to interact with Nessus 6 users.
   # Users can utilize Nessus based on their given role.

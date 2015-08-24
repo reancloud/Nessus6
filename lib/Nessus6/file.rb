@@ -1,8 +1,3 @@
-require 'json'
-require 'hurley'
-require 'Nessus6/errors/internal_server_error'
-require 'Nessus6/errors/unknown'
-
 module Nessus6
   # The File class is for uploading files to Nessus.
   # https://localhost:8834/api#/resources/file

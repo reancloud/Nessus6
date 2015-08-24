@@ -1,10 +1,3 @@
-require 'json'
-require 'Nessus6/errors/internal_server_error'
-require 'Nessus6/errors/forbidden'
-require 'Nessus6/errors/bad_request'
-require 'Nessus6/errors/not_found'
-require 'Nessus6/errors/unknown'
-
 module Nessus6
   # The Folders class is for interacting with Nessus6 folders. Folders are used
   # to sort and organize a user's scan results.

@@ -1,3 +1,12 @@
+require 'json'
+require 'nessus6/errors/bad_request'
+require 'nessus6/errors/conflict'
+require 'nessus6/errors/forbidden'
+require 'nessus6/errors/internal_server_error'
+require 'nessus6/errors/not_found'
+require 'nessus6/errors/unauthorized'
+require 'nessus6/errors/unknown'
+
 module Nessus6
   # The verification class allows methods to verify responses from Nessus
   module Verification

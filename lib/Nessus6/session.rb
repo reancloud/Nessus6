@@ -1,10 +1,3 @@
-require 'json'
-require 'Nessus6/errors/bad_request'
-require 'Nessus6/errors/forbidden'
-require 'Nessus6/errors/internal_server_error'
-require 'Nessus6/errors/unauthorized'
-require 'Nessus6/errors/unknown'
-
 module Nessus6
   # The Session class is used to create a session with Nessus6. User sessions
   # allow us to interact throughout our applications.
