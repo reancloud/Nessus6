@@ -2,9 +2,11 @@
 
 # Nessus6
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/Nessus6`. To experiment with that code, run `bin/console` for an interactive prompt.
+Welcome to the Nessus6 gem. This gem focuses on allowing you to programmatically interact with the Nessus version 6 REST API. 
 
-TODO: Delete this and the text above, and describe your gem
+## Requires
+* Nessus 6
+* Ruby >= 2.0
 
 ## Installation
 
@@ -24,13 +26,13 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+To learn how to use this, please go to https://rubygems.org/gems/Nessus6 and then click on Documentation in the right hand menu or use Yard to generate documentation for this library locally.
 
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `bin/console` for an interactive prompt that will allow you to experiment.
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release` to create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+To install this gem onto your local machine, run `bundle exec rake install`. 
 
 ## Contributing
 
