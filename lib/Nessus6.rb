@@ -13,6 +13,7 @@ require 'Nessus6/permission'
 require 'Nessus6/scan'
 require 'Nessus6/errors/authentication_error'
 
+# The Nessus6 module is used to interact with Nessus version 6 servers.
 module Nessus6
   # The Client class is used to interact with the Nessus API
   class Client
