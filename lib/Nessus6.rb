@@ -4,21 +4,25 @@ require 'Nessus6/verification'
 # Inherits from verification
 require 'Nessus6/version'
 require 'Nessus6/editor'
-require 'Nessus6/session'
-require 'Nessus6/user'
 require 'Nessus6/file'
 require 'Nessus6/folder'
 require 'Nessus6/group'
 require 'Nessus6/permission'
+require 'Nessus6/plugin'
+require 'Nessus6/plugin_rule'
 require 'Nessus6/scan'
+require 'Nessus6/scanner'
+require 'Nessus6/server'
+require 'Nessus6/session'
+require 'Nessus6/user'
 require 'Nessus6/errors/authentication_error'
 
 # The Nessus6 module is used to interact with Nessus version 6 servers.
 module Nessus6
   # The Client class is used to interact with the Nessus API
   class Client
-    attr_reader :client, :editor, :session, :user, :file, :folder, :group,
-                :permission, :scan
+    attr_reader :client, :editor, :file, :folder, :group, :permission, :plugin,
+                :plugin_rule, :scan, :scanner, :server, :session, :user
 
     def initialize(credentials, nessus)
       nessus[:port] = '8834' unless nessus.key?(:port)
@@ -55,14 +59,18 @@ module Nessus6
     private
 
     def build_clients(client)
-      @session = Nessus6::Session.new client
       @editor = Nessus6::Editor.new client
-      @user = Nessus6::User.new client
       @file = Nessus6::File.new client
       @folder = Nessus6::Folder.new client
       @group = Nessus6::Group.new client
       @permission = Nessus6::Permission.new client
+      @plugin = Nessus6::Plugin.new client
+      @plugin_rule = Nessus6::PluginRule.new client
       @scan = Nessus6::Scan.new client
+      @scanner = Nessus6::Scanner.new client
+      @server = Nessus6::Server.new client
+      @session = Nessus6::Session.new client
+      @user = Nessus6::User.new client
     end
   end
 end

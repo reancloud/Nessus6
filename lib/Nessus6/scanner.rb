@@ -6,6 +6,10 @@ module Nessus6
 
     public
 
+    def initialize(client)
+      @client = client
+    end
+
     # Returns the scanner list. This request requires administrator user
     # permissions.
     #

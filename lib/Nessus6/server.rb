@@ -6,6 +6,10 @@ module Nessus6
 
     public
 
+    def initialize(client)
+      @client = client
+    end
+
     # Returns the Nessus server version and other properties.
     #
     # @return [Hash]
