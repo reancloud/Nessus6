@@ -21,7 +21,8 @@ require 'Nessus6/errors/authentication_error'
 module Nessus6
   # The Client class is used to interact with the Nessus API
   class Client
-    attr_reader :client, :editor, :file, :folder, :group, :permission, :plugin,
+    attr_accessor :client
+    attr_reader :editor, :file, :folder, :group, :permission, :plugin,
                 :plugin_rule, :scan, :scanner, :server, :session, :user
 
     def initialize(credentials, nessus)
