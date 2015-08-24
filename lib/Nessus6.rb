@@ -15,7 +15,7 @@ require 'Nessus6/scanner'
 require 'Nessus6/server'
 require 'Nessus6/session'
 require 'Nessus6/user'
-require 'Nessus6/errors/authentication_error'
+require 'Nessus6/error/authentication_error'
 
 # The Nessus6 module is used to interact with Nessus version 6 servers.
 module Nessus6
