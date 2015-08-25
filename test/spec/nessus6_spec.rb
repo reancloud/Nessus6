@@ -12,9 +12,11 @@ end
 module Nessus6Test
   describe 'Client', 'The Nessus 6 API Client' do
     before do
-      creds = { username: 'test', password: 'test' }
+      creds_user = { username: 'test', password: 'test' }
+      creds_api = { access_key: 'test', secret_key: 'test' }
       location = { ip: 'localhost', port: '8834' }
-      @client = Nessus6::Client.new creds, location
+      @client = Nessus6::Client.new creds_user, location
+      @client_api = Nessus6::Client.new creds_api, location
     end
 
     it 'should have a version number' do
@@ -23,6 +25,11 @@ module Nessus6Test
 
     it 'should initialize with a verified session' do
       expect(@client).must_be_instance_of Nessus6::Client
+    end
+
+    it "should raise an error when credentials aren't provided" do
+      expect(proc { Nessus6::Client.new({}, {}) }).must_raise
+        Nessus6::Error::AuthenticationError
     end
 
     it 'should have a editor client' do
