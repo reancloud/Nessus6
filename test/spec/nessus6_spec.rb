@@ -27,11 +27,6 @@ module Nessus6Test
       expect(@client).must_be_instance_of Nessus6::Client
     end
 
-    it "should raise an error when credentials aren't provided" do
-      expect(proc { Nessus6::Client.new({}, {}) }).must_raise
-        Nessus6::Error::AuthenticationError
-    end
-
     it 'should have a editor client' do
       expect(@client.editor).must_be_instance_of Nessus6::Editor
     end

@@ -58,6 +58,8 @@ module Nessus6
     def list(type)
       response = @client.get("editor/#{type}/templates")
       verify response,
+             bad_request: 'Request could not be completed. Please use either '\
+                          'type "scan" or type "policy".',
              forbidden: 'You do not have permission to view the list',
              internal_server_error: 'Internal server error occurred.'
     end
