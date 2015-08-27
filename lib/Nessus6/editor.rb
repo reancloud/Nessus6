@@ -75,7 +75,8 @@ module Nessus6
     #   the family.
     # @return [Hash] The plugin output
     def plugin_description(policy_id, family_id, plugin_id)
-      response = @client.get("editor/policy/#{policy_id}/families/#{family_id}/plugins/#{plugin_id}")
+      response = @client.get("editor/policy/#{policy_id}/families/#{family_id}"\
+        "/plugins/#{plugin_id}")
       verify response,
              internal_server_error: 'Internal server error occurred.'
     end
