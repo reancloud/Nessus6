@@ -35,6 +35,9 @@ ratings:
   - bin/**
   - lib/**
   - test/**
+  - Rakefile
+  - Nessus6.gemspec
+  - Gemfile
 #   - "**.rb"
 #   - "**.go"
 
