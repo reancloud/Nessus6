@@ -9,6 +9,7 @@ module Nessus6
   end
 end
 
+# The Nessus6Test module allows us to namespace the tests for the Nessus6 Client
 module Nessus6Test
   describe 'Server', 'The Nessus 6 API Client Server Class' do
     before do
