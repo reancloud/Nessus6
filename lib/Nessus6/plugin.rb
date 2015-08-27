@@ -1,3 +1,4 @@
+# The Nessus6 module is used to interact with Nessus version 6 servers.
 module Nessus6
   # The Plugin class is for interacting with Nessus6 plugins.
   # https://localhost:8834/api#/resources/plugins

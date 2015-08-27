@@ -1,3 +1,4 @@
+# The Nessus6 module is used to interact with Nessus version 6 servers.
 module Nessus6
   # The Permissions class is for interacting with Nessus6 user permissions.
   # Permissions are used to provide access rights to a given object.

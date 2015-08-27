@@ -1,3 +1,4 @@
+# The Nessus6 module is used to interact with Nessus version 6 servers.
 module Nessus6
   # The Folders class is for interacting with Nessus6 folders. Folders are used
   # to sort and organize a user's scan results.

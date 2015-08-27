@@ -10,13 +10,15 @@ Gem::Specification.new do |spec|
   spec.email         = ['kev.kirsche@gmail.com']
   spec.license       = 'Apache-2.0'
 
-  spec.summary       = %q{[Under Construction] Nessus 6 API Gem}
-  spec.description   = %q{Gem for interacting with the Tenable Nessus 6 REST API.}
+  spec.summary       = '[Under Construction] Nessus 6 API Gem'
+  spec.description   = 'Gem for interacting with the Tenable Nessus 6 REST API.'
   spec.homepage      = 'https://github.com/kkirsche/Nessus6'
 
   spec.required_ruby_version = '>= 2.0.0'
 
-  spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
+  spec.files         = `git ls-files -z`.split("\x0").reject do |files|
+    files.match(%r{^(test|spec|features)/})
+  end
   spec.bindir        = 'exe'
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']

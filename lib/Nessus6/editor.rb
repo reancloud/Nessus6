@@ -1,3 +1,4 @@
+# The Nessus6 module is used to interact with Nessus version 6 servers.
 module Nessus6
   # The Editor class is for interacting with Nessus6 templates. Templates are
   # used to create scans or policies with predefined parameters.

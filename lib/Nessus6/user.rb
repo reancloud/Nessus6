@@ -1,3 +1,4 @@
+# The Nessus6 module is used to interact with Nessus version 6 servers.
 module Nessus6
   # The Users class allows us to interact with Nessus 6 users.
   # Users can utilize Nessus based on their given role.

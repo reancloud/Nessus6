@@ -7,6 +7,7 @@ require 'Nessus6/error/not_found'
 require 'Nessus6/error/unauthorized'
 require 'Nessus6/error/unknown'
 
+# The Nessus6 module is used to interact with Nessus version 6 servers.
 module Nessus6
   # The verification class allows methods to verify responses from Nessus
   module Verification

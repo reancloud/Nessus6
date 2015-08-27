@@ -1,3 +1,4 @@
+# The Nessus6 module is used to interact with Nessus version 6 servers.
 module Nessus6
   # The Session class is used to create a session with Nessus6. User sessions
   # allow us to interact throughout our applications.

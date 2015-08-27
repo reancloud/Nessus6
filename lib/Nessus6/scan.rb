@@ -1,3 +1,4 @@
+# The Nessus6 module is used to interact with Nessus version 6 servers.
 module Nessus6
   # The Scans class is for interacting with Nessus6 scans.
   # https://localhost:8834/api#/resources/scans

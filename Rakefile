@@ -8,4 +8,4 @@ Rake::TestTask.new(:test) do |t|
   t.pattern = 'test/spec/**/*_spec.rb'
 end
 
-task :default => :test
+task default: :test

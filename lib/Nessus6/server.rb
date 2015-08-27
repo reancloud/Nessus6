@@ -1,3 +1,4 @@
+# The Nessus6 module is used to interact with Nessus version 6 servers.
 module Nessus6
   # The Server class returns information about the Nessus Server itself
   # https://localhost:8834/api#/resources/server

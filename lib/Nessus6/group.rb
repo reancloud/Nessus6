@@ -1,3 +1,4 @@
+# The Nessus6 module is used to interact with Nessus version 6 servers.
 module Nessus6
   # The Groups class is for interacting with Nessus6 user groups. Groups are
   # utilized to make sharing easier.

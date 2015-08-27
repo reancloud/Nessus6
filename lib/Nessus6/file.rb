@@ -1,3 +1,4 @@
+# The Nessus6 module is used to interact with Nessus version 6 servers.
 module Nessus6
   # The File class is for uploading files to Nessus.
   # https://localhost:8834/api#/resources/file
