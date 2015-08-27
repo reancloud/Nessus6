@@ -36,10 +36,10 @@ module Nessus6Test
 
     it 'should returns the details for the given template.' do
       result = {
-        'operators' =>['eq', 'neq'],
-        'control' =>{
+        'operators' => %w(eq neq),
+        'control' => {
           'type' => 'dropdown',
-          'list' =>['None', 'Low', 'Medium', 'High', 'Critical']
+          'list' => %w(None Low Medium High Critical)
         },
         'name' => 'risk_factor',
         'readable_name' => 'Risk Factor'
@@ -73,11 +73,11 @@ module Nessus6Test
         'templates' => [
           {
             'more_info' => 'http://www.tenable.com/products/nessus/nessus-cloud',
-            'cloud_only' =>false,
+            'cloud_only' => false,
             'desc' => 'Approved for quarterly external scanning as required by PCI.',
-            'subscription_only' =>true,
+            'subscription_only' => true,
             'title' => 'PCI Quarterly External Scan',
-            'is_agent' =>nil,
+            'is_agent' => nil
           }
         ]
       }
