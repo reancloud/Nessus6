@@ -23,7 +23,7 @@ module Nessus6
     # @return [String] The session token
     def create(username, password)
       response = @client.post('session',
-                          username: username, password: password)
+                              username: username, password: password)
       verified = verify response,
                         bad_request: 'Username format is not valid',
                         unauthorized: 'Username or password is invalid',

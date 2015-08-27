@@ -72,9 +72,11 @@ module Nessus6Test
       result = {
         'templates' => [
           {
-            'more_info' => 'http://www.tenable.com/products/nessus/nessus-cloud',
+            'more_info' => 'http://www.tenable.com/products/nessus/nessus-'\
+                           'cloud',
             'cloud_only' => false,
-            'desc' => 'Approved for quarterly external scanning as required by PCI.',
+            'desc' => 'Approved for quarterly external scanning as required '\
+                      'by PCI.',
             'subscription_only' => true,
             'title' => 'PCI Quarterly External Scan',
             'is_agent' => nil

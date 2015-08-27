@@ -29,7 +29,7 @@ module Nessus6
       nessus[:port] = '8834' unless nessus.key?(:port)
 
       # Create our client
-      @client = Hurley::Client.new 'https://' + nessus[:ip] + ':' + nessus[:port]
+      @client = Hurley::Client.new "https://#{nessus[:ip]}:#{nessus[:port]}"
       @client.ssl_options.skip_verification = true
 
       authenticate credentials
