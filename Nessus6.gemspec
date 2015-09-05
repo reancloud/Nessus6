@@ -28,5 +28,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'minitest', '~> 5.8'
   spec.add_development_dependency 'yard', '~> 0.8'
   spec.add_development_dependency 'codeclimate-test-reporter', '~> 0.4'
-  spec.add_runtime_dependency 'hurley', '~> 0.1'
+  spec.add_runtime_dependency 'hurley', '~> 0.2'
 end
