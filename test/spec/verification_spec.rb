@@ -21,49 +21,55 @@ module Nessus6Test
     it 'should raise a bad request error' do
       mock = Minitest::Mock.new
       mock.expect :status_code, 400
-      expect(proc { @client.user.send :verify, mock, 'Test' }).must_raise
-        Nessus6::Error::BadRequestError
+      expect(proc { @client.user.send :verify, mock,
+                    bad_request: 'Test' }).must_raise \
+                    Nessus6::Error::BadRequestError
     end
 
     it 'should raise an unauthorized error' do
       mock = Minitest::Mock.new
       mock.expect :status_code, 401
-      expect(proc { @client.user.send :verify, mock, 'Test' }).must_raise
-        Nessus6::Error::UnauthorizedError
+      expect(proc { @client.user.send :verify, mock,
+                    unauthorized: 'Test' }).must_raise \
+                    Nessus6::Error::UnauthorizedError
     end
 
     it 'should raise a forbidden error' do
       mock = Minitest::Mock.new
       mock.expect :status_code, 403
-      expect(proc { @client.user.send :verify, mock, 'Test' }).must_raise
-        Nessus6::Error::ForbiddenError
+      expect(proc { @client.user.send :verify, mock,
+                    forbidden: 'Test' }).must_raise \
+                    Nessus6::Error::ForbiddenError
     end
 
     it 'should raise a not found error' do
       mock = Minitest::Mock.new
       mock.expect :status_code, 404
-      expect(proc { @client.user.send :verify, mock, 'Test' }).must_raise
-        Nessus6::Error::NotFoundError
+      expect(proc { @client.user.send :verify, mock,
+                    not_found: 'Test' }).must_raise \
+                    Nessus6::Error::NotFoundError
     end
 
     it 'should raise a conflict error' do
       mock = Minitest::Mock.new
       mock.expect :status_code, 409
-      expect(proc { @client.user.send :verify, mock, 'Test' }).must_raise
-        Nessus6::Error::ConflictError
+      expect(proc { @client.user.send :verify, mock,
+                    conflict: 'Test' }).must_raise \
+                    Nessus6::Error::ConflictError
     end
 
     it 'should raise an internal server error' do
       mock = Minitest::Mock.new
       mock.expect :status_code, 500
-      expect(proc { @client.user.send :verify, mock, 'Test' }).must_raise
-        Nessus6::Error::InternalServerError
+      expect(proc { @client.user.send :verify, mock,
+                    internal_server_error: 'Test' }).must_raise \
+                    Nessus6::Error::InternalServerError
     end
 
     it 'should raise an unknown error' do
       mock = Minitest::Mock.new
       mock.expect :status_code, 900_000
-      expect(proc { @client.user.send :verify, mock, 'Test' }).must_raise
+      expect(proc { @client.user.send :verify, mock }).must_raise \
         Nessus6::Error::UnknownError
     end
   end
