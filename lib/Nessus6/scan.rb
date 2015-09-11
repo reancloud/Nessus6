@@ -115,6 +115,30 @@ module Nessus6
              conflict: 'Scan is not active.'
     end
 
+    # Resumes a scan
+    #
+    # @param scan_id [String, Fixnum] The id of the scan to resume
+    # @return [Hash]
+    def resume(scan_id)
+      response = @client.post "scans/#{scan_id}/resume"
+      verify response,
+             not_found: 'A scan with that ID could not be located',
+             conflict: "The scan is not active and / or couldn't be resumed"
+    end
+
+    # Enables or disables a scan schedule
+    #
+    # @param scan_id [String, Fixnum] The id of the scan
+    # @param enabled [String, Trueclass, Falseclass] Enables or disables the
+    #   scan schedule
+    # @return [Hash] With enabled, control, rules, starttime, and timezone
+    def schedule(scan_id, enabled)
+      response = client.put "scans/#{scan_id}/schedule", enabled: enabled
+      verify response,
+             not_found: 'A scan with that ID could not be located',
+             internal_server_error: 'The scan does not have a schedule enabled'
+    end
+
     # Stops a scan.
     #
     # @param scan_id [String, Fixnum] The id of the scan to stop.
@@ -124,6 +148,16 @@ module Nessus6
       verify response,
              not_found: 'Scan does not exist.',
              conflict: 'Scan is not active.'
+    end
+
+    # Returns the timezone list for creating a scan.
+    #
+    # @return [Hash] The timezone resource
+    def timezones
+      response = @client.get 'scans/timezones'
+      verify response,
+             unauthorized: 'You do not have permission to view timezones',
+             internal_server_error: 'Internal server error occurred'
     end
   end
 end
