@@ -115,6 +115,33 @@ module Nessus6
              conflict: 'Scan is not active.'
     end
 
+    # Returns the output for a given plugin
+    #
+    # @param scan_id [String, Integer] The id of the scan to retrieve
+    # @param host_id [String, Integer] The id of the host to retrieve
+    # @param plugin_id [String, Integer] The id of the plugin to retrieve
+    # @param history_id [String, Integer] The history_id of the historical data
+    #   that should be returned
+    # @return [Hash] Plugin information object
+    def plugin_output(scan_id, host_id, plugin_id, history_id = nil)
+      response = @client.get "scans/#{scan_id}/hosts/#{host_id}/plugins/"\
+                             "#{plugin_id}", history_id: history_id
+      verify response,
+             internal_server_error: 'Internal server error'
+    end
+
+    # Changes the status of a scan
+    #
+    # @param scan_id [String, Fixnum] The id of the scan to change
+    # @param read [String, Trueclass, Falseclass] If true, the scan has been
+    #   read
+    # @return [Hash]
+    def read_status(scan_id, read)
+      response = @client.put "scans/#{scan_id}/status", read: read
+      verify response,
+             not_found: 'A scan with that ID could not be located.'
+    end
+
     # Resumes a scan
     #
     # @param scan_id [String, Fixnum] The id of the scan to resume
