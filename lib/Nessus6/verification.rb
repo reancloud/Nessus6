@@ -3,6 +3,7 @@ require 'Nessus6/error/bad_request'
 require 'Nessus6/error/conflict'
 require 'Nessus6/error/forbidden'
 require 'Nessus6/error/internal_server_error'
+require 'Nessus6/error/method_not_allowed'
 require 'Nessus6/error/not_found'
 require 'Nessus6/error/unauthorized'
 require 'Nessus6/error/unknown'
@@ -25,6 +26,8 @@ module Nessus6
         fail Nessus6::Error::ForbiddenError, "#{message[:forbidden]}"
       when 404
         fail Nessus6::Error::NotFoundError, "#{message[:not_found]}"
+      when 405
+        fail Nessus6::Error::MethodNotAllowedError, "#{message[:not_allowed]}"
       when 409
         fail Nessus6::Error::ConflictError, "#{message[:conflict]}"
       when 500
