@@ -10,6 +10,7 @@ require 'Nessus6/group'
 require 'Nessus6/permission'
 require 'Nessus6/plugin'
 require 'Nessus6/plugin_rule'
+require 'Nessus6/policy'
 require 'Nessus6/scan'
 require 'Nessus6/scanner'
 require 'Nessus6/server'
@@ -23,7 +24,8 @@ module Nessus6
   class Client
     attr_accessor :client
     attr_reader :editor, :file, :folder, :group, :permission, :plugin,
-                :plugin_rule, :scan, :scanner, :server, :session, :user
+                :plugin_rule, :policy, :scan, :scanner, :server, :session,
+                :user
 
     def initialize(credentials, nessus)
       nessus[:port] = '8834' unless nessus.key?(:port)
@@ -66,6 +68,7 @@ module Nessus6
       @group = Nessus6::Group.new client
       @permission = Nessus6::Permission.new client
       @plugin = Nessus6::Plugin.new client
+      @policy = Nessus6::Policy.new client
       @plugin_rule = Nessus6::PluginRule.new client
       @scan = Nessus6::Scan.new client
       @scanner = Nessus6::Scanner.new client
