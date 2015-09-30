@@ -16,7 +16,7 @@ module Nessus6
     # @param file_path [String] Path to the file to upload
     # @param file_type [String] MIME type. E.g. 'text/plain'
     # @return [Hash] Returns a :fileuploaded string.
-    def upload(file_path, file_type, encrypted = 0)
+    def upload(file_path, file_type = 'text/plain', encrypted = 0)
       response = @client.post('file/upload',
                               file: Hurley::UploadIO.new(file_path, file_type),
                               no_enc: encrypted)
