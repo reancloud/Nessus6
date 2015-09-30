@@ -46,6 +46,7 @@ module Nessus6
         @token = @session.create(credentials[:username], credentials[:password])
         @client.header['X-Cookie'] = "token = #{@token}"
       elsif credentials[:access_key] && credentials[:secret_key]
+        @client.header['X-ApiKeys'] = "accessKey=#{credentials[:access_key]}; secretKey=#{credentials[:secret_key]}"
       else
         fail Nessus6::Error::AuthenticationError, 'Authentication credentials' \
           ' not provided. Must provided either username and password or ' \
