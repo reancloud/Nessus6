@@ -1,6 +1,5 @@
 language: ruby
 sudo: false
-before_install: gem install bundler -v 1.10.6
 cache: bundler
 rvm:
   - 2.0.0
@@ -15,6 +14,7 @@ rvm:
   - jruby-head
 
 before_install:
+  - gem install bundler -v 1.10.6
   - gem update --system
   - gem --version
 
