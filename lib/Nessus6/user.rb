@@ -94,7 +94,7 @@ module Nessus6
     # @return [Hash] The user list
     def list
       response = @client.get('users')
-      verif response,
+      verify response,
             forbidden: 'You do not have permission to view the list'
     end
 

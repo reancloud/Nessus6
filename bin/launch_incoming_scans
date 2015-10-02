@@ -1,0 +1,54 @@
+#!/usr/bin/env ruby
+
+require 'Nessus6'
+require 'fileutils'
+require 'logger'
+
+# Global variables for the script / binary
+@base_directory = '/opt/scanner'
+@temp_directory = "#{@base_directory}/temp#{Process.pid}"
+@incoming_directory = "#{@base_directory}/targets/incoming"
+@results_directory = "#{@base_directory}/results"
+@send_mail = '/usr/lib/sendmail -t'
+
+credentials = {
+  access_key: 'eeb88394142b4b328332c2448e0f04846161493a50feaa454cbb2fa5083919f9',
+  secret_key: 'b0d69c23612754367a84d168f2e7d6769aff1342cb25aa345481cb537164e092'
+}
+
+nessus_location = {
+  ip: 'localhost',
+  port: '8834'
+}
+
+@append_results = "x-scanner|#{nessus_location[:ip]}"
+
+# Prep work
+FileUtils.mkdir_p @temp_directory
+@logger = Logger.new(STDOUT)
+@logger.level = Logger::INFO
+
+# Begin the main portion of the app
+@logger.debug 'Creating Nessus API Client'
+@client = Nessus6::Client.new credentials, nessus_location
+
+Dir.foreach(@incoming_directory) do |file|
+  @logger.debug "Processing #{@incoming_directory}/#{file}"
+  next if file == '.' || file == '..' # skip current / parent directory opts
+
+  @logger.info "Archiving #{@incoming_directory}/#{file} to " \
+               "#{@base_directory}/targets/archive/#{file}."
+#   FileUtils.copy "#{@incoming_directory}/#{file}",
+#                  "#{@base_directory}/targets/archive/#{file}"
+
+  @logger.info "Moving #{@incoming_directory}/#{file} to " \
+               "#{@temp_directory}/#{file}"
+#   FileUtils.move "#{@incoming_directory}/#{file}",
+#                  "#{@temp_directory}/#{file}"
+
+  @logger.info 'Finding the request ID in the file.'
+  request_id = File.readlines("#{@incoming_directory}/#{file}").select do |line|
+    line =~ /^requestid.*$/
+  end
+  puts request_id
+end

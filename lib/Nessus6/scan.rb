@@ -11,6 +11,18 @@ module Nessus6
       @client = client
     end
 
+    # Changes the schedule or policy parameters of a scan
+    #
+    # @param scan_id [String, Fixnum] The id of the scan to change.
+    # @param opts [Hash]
+    # @return [Hash] Returns information about the scan in question.
+    def configure(scan_id, opts)
+      response = client.put "scans/#{scan_id}", opts
+      verify response,
+             not_found: 'Scan does not exist.',
+             internal_server_error: 'Error occurred while saving the configuration'
+    end
+
     # Copies the given scan. Requires can configure scan permissions
     #
     # @param scan_id [String, Fixnum] The id of the scan to export.
@@ -28,8 +40,19 @@ module Nessus6
       end
 
       verify response,
-             not_found: 'Scan does not exist.',
+             not_found: "Scan with Scan ID of #{scan_id} does not exist.",
              internal_server_error: 'An error occurred while copying.'
+    end
+
+    # Creates a scan.
+    # This request requires standard user permissions.
+    #
+    # @param opts [Hash] The parameters hash required for creating a scan.
+    # @return [Hash]
+    def create(opts)
+      response = @client.post 'scans', opts
+      verify response,
+             internal_server_error: 'An error occurred while saving the scan.'
     end
 
     # Deletes a scan. NOTE: Scans in running, paused or stopping states can not
@@ -54,7 +77,7 @@ module Nessus6
     def delete_history(scan_id, query_params = nil)
       response = @client.delete "scans/#{scan_id}"
       verify response,
-             not_found: 'Results were not found.',
+             not_found: "Results were not found for scan #{scan_id}.",
              internal_server_error: 'Failed to delete the results.'
     end
 
@@ -72,6 +95,33 @@ module Nessus6
         response = @client.get("scans/#{scan_id}", history_id: history_id)
       end
       JSON.parse response.body
+    end
+
+    # Downloads an exported scan
+    # This request requires can view scan permissions
+    #
+    # @param scan_id [String, Fixnum] The id of the scan to export
+    # @param file_id [String, Fixnum] The id of the file to download (included in response from /scans/{scan_id}/export)
+    def download(scan_id, file_id, write_path = nil)
+      response = @client.get "scans/#{scan_id}/export/#{file_id}/download"
+      hash_response = verify response,
+                      not_found: 'The scan or file does not exist.'
+
+      File.open(write_path, 'w+') { |file| file.write response } unless write_path.nil?
+      hash_response
+    end
+
+    # Export the given scan
+    # This request requires can view scan permissions
+    #
+    # @param scan_id [String, Fixnum] The id of the scan to export
+    # @param opts [Hash] The hash of query parameters
+    def export(scan_id, params)
+      response = @client.post "scans/#{scan_id}/export", params
+      verify response,
+             bad_request: 'Missing required parameters: Scan ID or File Format'\
+                          ' (:format) are required.',
+             not_found: "Scan ID #{scan_id} could not be found. Please try again"
     end
 
     # Launches a scan.
