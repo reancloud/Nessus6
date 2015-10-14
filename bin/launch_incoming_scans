@@ -12,8 +12,8 @@ require 'logger'
 @send_mail = '/usr/lib/sendmail -t'
 
 credentials = {
-  access_key: 'eeb88394142b4b328332c2448e0f04846161493a50feaa454cbb2fa5083919f9',
-  secret_key: 'b0d69c23612754367a84d168f2e7d6769aff1342cb25aa345481cb537164e092'
+  access_key: '',
+  secret_key: ''
 }
 
 nessus_location = {
