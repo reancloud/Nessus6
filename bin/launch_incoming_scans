@@ -42,17 +42,46 @@ Dir.foreach(@incoming_directory) do |file|
 
   @logger.info "Archiving #{@incoming_directory}/#{file} to " \
                "#{@base_directory}/targets/archive/#{file}."
-#   FileUtils.copy "#{@incoming_directory}/#{file}",
-#                  "#{@base_directory}/targets/archive/#{file}"
+  # FileUtils.copy "#{@incoming_directory}/#{file}",
+  #                "#{@base_directory}/targets/archive/#{file}"
 
   @logger.info "Moving #{@incoming_directory}/#{file} to " \
                "#{@temp_directory}/#{file}"
-#   FileUtils.move "#{@incoming_directory}/#{file}",
-#                  "#{@temp_directory}/#{file}"
+  # FileUtils.move "#{@incoming_directory}/#{file}",
+  #                "#{@temp_directory}/#{file}"
 
-  @logger.info 'Finding the request ID in the file.'
-  request_id = File.readlines("#{@incoming_directory}/#{file}").select do |line|
-    line =~ /^requestid.*$/
+  @logger.info 'Finding the target scan details (id, method, target ip).'
+  file = File.open("#{@incoming_directory}/#{file}") { |file| file.read }
+
+  file_array = file.split("\n")
+
+  request_id = []
+  method = []
+  ips = []
+
+  file_array.each do |line|
+    if line =~ /requestid\:\t(?<request_id>\d+)/
+      request_id.push line[11..-1]
+      next
+    end
+    if line =~ /method\:\t(?<method>.+)/
+      method.push line[8..-1]
+      next
+    end
+    ips.push line[0..-3] if line =~ /^(?<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\/\d$/
+    ips.push line[0..-4] if line =~ /^(?<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\/\d\d$/
+    next
   end
-  puts request_id
+
+  @logger.info "Found Request ID #{request_id[0]}; Found Method #{method[0]}; Found IP's #{ips}"
+
+  scan_id_to_launch = scan[method[0].to_sym]
+
+  @logger.info 'Launching scan.'
+  result = @client.scan.launch scan_id_to_launch, ips
+  if result.key? 'scan_uuid'
+    @logger.info "Scan launched successfully. Scan has been assigned a UUID of #{result['scan_uuid']}."
+  else
+    @logger.info 'Launching the scan failed.'
+  end
 end
