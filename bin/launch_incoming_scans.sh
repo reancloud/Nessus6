@@ -11,10 +11,9 @@ RESULTSDIR=${BASEDIR}/results
 SENDMAIL="/usr/lib/sendmail -t"
 
 NESSUSBIN=/opt/nessus/bin/nessus
-NESSUSUSER=scripts
+NESSUSUSER=xxxx
 NESSUSPASSWORD=XXXXXXXXXXXXXXX
 
-IPADDR="153.39.86.90"
 APPENDRESULTS="x-scanner|${IPADDR}"
 
 mkdir -p ${TEMPDIR}
