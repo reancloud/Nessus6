@@ -21,6 +21,10 @@ nessus_location = {
   port: '8834'
 }
 
+scan = {
+  default: 13
+}
+
 @append_results = "x-scanner|#{nessus_location[:ip]}"
 
 # Prep work
