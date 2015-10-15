@@ -3,6 +3,24 @@
 require 'Nessus6'
 require 'fileutils'
 require 'logger'
+require 'sqlite3'
+
+def launch_scan(target_scan_id, target_ip_addresses)
+  @logger.info 'Attempting to launch scan.'
+  begin
+    result = @client.scan.launch target_scan_id, target_ip_addresses
+    if result.key? 'scan_uuid'
+      @logger.info "Scan launched successfully. Scan has been assigned a UUID of #{result['scan_uuid']}."
+      result
+    else
+      @logger.info 'Failed to launch scan due to an unknown reason..'
+      false
+    end
+  rescue Nessus6::Error::InternalServerError
+    @logger.error 'Failed to launch scan. A scan is already running.'
+    false
+  end
+end
 
 # Global variables for the script / binary
 @base_directory = '/opt/scanner'
@@ -27,61 +45,86 @@ scan = {
 
 @append_results = "x-scanner|#{nessus_location[:ip]}"
 
-# Prep work
-FileUtils.mkdir_p @temp_directory
-@logger = Logger.new(STDOUT)
-@logger.level = Logger::INFO
+begin
+  # Prep work
+  @logger = Logger.new(STDOUT)
+  @logger.level = Logger::INFO
 
-# Begin the main portion of the app
-@logger.debug 'Creating Nessus API Client'
-@client = Nessus6::Client.new credentials, nessus_location
+  @logger.info "Creating temporary directory: #{@temp_directory}"
+  FileUtils.mkdir_p @temp_directory
 
-Dir.foreach(@incoming_directory) do |file|
-  @logger.debug "Processing #{@incoming_directory}/#{file}"
-  next if file == '.' || file == '..' # skip current / parent directory opts
+  # Begin the main portion of the app
+  @logger.debug 'Creating Nessus API Client'
+  @client = Nessus6::Client.new credentials, nessus_location
 
-  @logger.info "Archiving #{@incoming_directory}/#{file} to " \
-               "#{@base_directory}/targets/archive/#{file}."
-  # FileUtils.copy "#{@incoming_directory}/#{file}",
-  #                "#{@base_directory}/targets/archive/#{file}"
+  # Loop through the directory and process each file in it.
+  Dir.foreach(@incoming_directory) do |file|
+    @logger.debug "Processing #{@incoming_directory}/#{file}"
+    next if file == '.' || file == '..' # skip current / parent directory opts
 
-  @logger.info "Moving #{@incoming_directory}/#{file} to " \
-               "#{@temp_directory}/#{file}"
-  # FileUtils.move "#{@incoming_directory}/#{file}",
-  #                "#{@temp_directory}/#{file}"
+    @logger.info "Archiving #{@incoming_directory}/#{file} to " \
+                 "#{@base_directory}/targets/archive/#{file}."
+    FileUtils.copy "#{@incoming_directory}/#{file}",
+                   "#{@base_directory}/targets/archive/#{file}"
 
-  @logger.info 'Finding the target scan details (id, method, target ip).'
-  file = File.open("#{@incoming_directory}/#{file}") { |file| file.read }
+    @logger.info "Moving #{@incoming_directory}/#{file} to " \
+                 "#{@temp_directory}/#{file}"
+    FileUtils.move "#{@incoming_directory}/#{file}",
+                   "#{@temp_directory}/#{file}"
 
-  file_array = file.split("\n")
+    @logger.info 'Finding the target scan details (id, method, target ip).'
+    file_contents = File.open("#{@temp_directory}/#{file}") { |file| file.read }
 
-  request_id = []
-  method = []
-  ips = []
+    # Take the request file and process each line individually
+    file_array = file_contents.split("\n")
 
-  file_array.each do |line|
-    if line =~ /requestid\:\t(?<request_id>\d+)/
-      request_id.push line[11..-1]
+    request_id = []
+    method = []
+    ips = []
+
+    # Process the request file and find the Request ID, Method, and IP Addresses
+    file_array.each do |line|
+      if line =~ /requestid\:\t(?<request_id>\d+)/
+        request_id.push line[11..-1]
+        next
+      end
+      if line =~ /method\:\t(?<method>.+)/
+        method.push line[8..-1]
+        next
+      end
+      ips.push line[0..-3] if line =~ /^(?<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\/\d$/
+      ips.push line[0..-4] if line =~ /^(?<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\/\d\d$/
       next
     end
-    if line =~ /method\:\t(?<method>.+)/
-      method.push line[8..-1]
-      next
+
+    @logger.info "Found Request ID #{request_id[0]}; Found Method #{method[0]}; Found IP's #{ips}"
+
+    # Take the scan method and find what the scan ID for it is.
+    scan_id_to_launch = scan[method[0].to_sym]
+
+    # Attempt to launch a scan. If it fails, wait 30 seconds then repeat.
+    @result = launch_scan(scan_id_to_launch, ips)
+    while @result == false
+      sleep 30
+      @result = launch_scan(scan_id_to_launch, ips)
     end
-    ips.push line[0..-3] if line =~ /^(?<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\/\d$/
-    ips.push line[0..-4] if line =~ /^(?<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\/\d\d$/
-    next
+
+    @logger.info 'Attempting to connect to database'
+
+    db = SQLite3::Database.new '/home/scripts/launched_nessus_scans.db'
+
+    @logger.info "Inserting scan UUID with 'INSERT INTO active_scans (request_id, method, scan_uuid) VALUES (?, ?, ?)', "\
+                 "[#{request_id[0]}, #{method[0]}, #{@result['scan_uuid']}]'"
+
+    db.execute 'INSERT INTO active_scans (request_id, method, scan_uuid) VALUES (?, ?, ?)',
+               [request_id[0], method[0], @result['scan_uuid']]
+
+    @logger.info 'Scan UUID saved successfully.'
+
+    @logger.info "Removing the temporary scan file #{@temp_directory}/#{file}"
+    FileUtils.rm "#{@temp_directory}/#{file}"
   end
-
-  @logger.info "Found Request ID #{request_id[0]}; Found Method #{method[0]}; Found IP's #{ips}"
-
-  scan_id_to_launch = scan[method[0].to_sym]
-
-  @logger.info 'Launching scan.'
-  result = @client.scan.launch scan_id_to_launch, ips
-  if result.key? 'scan_uuid'
-    @logger.info "Scan launched successfully. Scan has been assigned a UUID of #{result['scan_uuid']}."
-  else
-    @logger.info 'Launching the scan failed.'
-  end
+ensure
+  @logger.info "Removing temp directory: #{@temp_directory}"
+  FileUtils.rm_rf "#{@temp_directory}"
 end
