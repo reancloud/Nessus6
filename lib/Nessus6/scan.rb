@@ -124,6 +124,17 @@ module Nessus6
              not_found: "Scan ID #{scan_id} could not be found. Please try again"
     end
 
+    # Check the file status of an exported scan.
+    # This request requires can view scan permissions.
+    #
+    # @param scan_id [String, Fixnum] The id of the scan to export
+    # @param file_id [String, Fixnum] The id of the file to poll (Included in response from /scans/{scan_id}/export).
+    def export_status(scan_id, file_id)
+      response = @client.get "scans/#{scan_id}/export/#{file_id}/status"
+      verify response,
+             not_found: "Scan ID #{scan_id} could not be found. Please try again"
+    end
+
     # Launches a scan.
     #
     # @param scan_id [String, Fixnum] The id of the scan to launch.
