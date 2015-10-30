@@ -1,53 +1,55 @@
-  #!/usr/bin/env ruby
+#!/usr/bin/env ruby
 
-  require 'Nessus6'
-  require 'fileutils'
-  require 'logger'
-  require 'sqlite3'
-  require 'json'
+require 'Nessus6'
+require 'fileutils'
+require 'logger'
+require 'sqlite3'
+require 'json'
 
-  # Global variables for the script / binary
-  @base_directory = '/opt/scanner'
-  @results_directory = "#{@base_directory}/results"
-  @send_mail = '/usr/lib/sendmail -t'
+# Global variables for the script / binary
+@base_directory = '/opt/scanner'
+@results_directory = "#{@base_directory}/results"
+@send_mail = '/usr/lib/sendmail -t'
 
-  credentials = {
-    access_key: 'NA',
-    secret_key: 'NA'
+credentials = {
+  access_key: 'NA',
+  secret_key: 'NA'
+}
+
+nessus_location = {
+  ip: 'localhost',
+  port: '8834'
+}
+
+@append_results = "x-scanner|#{nessus_location[:ip]}"
+
+# Prep work
+@logger = Logger.new(STDOUT)
+@logger.level = Logger::INFO
+
+# Begin the main portion of the app
+@logger.debug 'Creating Nessus API Client'
+@client = Nessus6::Client.new credentials, nessus_location
+
+@db = SQLite3::Database.new '/home/scripts/launched_nessus_scans.db'
+@db.execute 'SELECT * FROM active_scans' do |row|
+  mapped_row = {
+    request_id: row[0],
+    method: row[1],
+    scan_uuid: row[2],
+    scan_id: row[3]
   }
+  opts = { format: :csv }
+  mapped_row[:file_id] = @client.scan.export mapped_row[:scan_id], opts
 
-  nessus_location = {
-    ip: 'localhost',
-    port: '8834'
-  }
+  # Lock it in a closure so we don't have to have a huge one liner
+  export_status = Proc.new { @client.scan.export_status mapped_row[:scan_id], mapped_row[:file_id] }
+  ready_status = { 'status' => 'ready' }
+  @logger.debug 'Waiting...' while export_status.call != ready_status
 
-  @append_results = "x-scanner|#{nessus_location[:ip]}"
+  file = @client.scan.download mapped_row[:scan_id],
+                               mapped_row[:file_id],
+                               "#{@results_directory}/#{mapped_row[:request_id].csv}"
 
-  # Prep work
-  @logger = Logger.new(STDOUT)
-  @logger.level = Logger::INFO
-
-  # Begin the main portion of the app
-  @logger.debug 'Creating Nessus API Client'
-  @client = Nessus6::Client.new credentials, nessus_location
-
-  @db = SQLite3::Database.new '/home/scripts/launched_nessus_scans.db'
-  @db.execute 'SELECT * FROM active_scans' do |row|
-    mapped_row = {
-      request_id: row[0],
-      method: row[1],
-      scan_uuid: row[2],
-      scan_id: row[3]
-    }
-    opts = { format: :csv }
-    mapped_row[:exported_scan_file] = @client.scan.export mapped_row[:scan_id], opts
-
-    while @client.scan.export_status
-
-    end
-    file = @client.scan.download mapped_row[:scan_id],
-                                 mapped_row[:exported_scan_file],
-                                 "#{@results_directory}/#{mapped_row[:request_id].csv}"
-
-    puts file
-  end
+  puts file
+end
