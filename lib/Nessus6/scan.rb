@@ -104,10 +104,13 @@ module Nessus6
     # @param file_id [String, Fixnum] The id of the file to download (included in response from /scans/{scan_id}/export)
     def download(scan_id, file_id, write_path = nil)
       response = @client.get "scans/#{scan_id}/export/#{file_id}/download"
-      hash_response = verify response,
-                      not_found: 'The scan or file does not exist.'
-
       File.open(write_path, 'w+') { |file| file.write response } unless write_path.nil?
+      begin
+        hash_response = verify response,
+                        not_found: 'The scan or file does not exist.'
+      rescue
+        hash_response = nil
+      end
       hash_response
     end
 

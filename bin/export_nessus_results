@@ -40,16 +40,14 @@ nessus_location = {
     scan_id: row[3]
   }
   opts = { format: :csv }
-  mapped_row[:file_id] = @client.scan.export mapped_row[:scan_id], opts
+  mapped_row[:file_id] = @client.scan.export(mapped_row[:scan_id], opts)['file']
 
   # Lock it in a closure so we don't have to have a huge one liner
   export_status = Proc.new { @client.scan.export_status mapped_row[:scan_id], mapped_row[:file_id] }
   ready_status = { 'status' => 'ready' }
   @logger.debug 'Waiting...' while export_status.call != ready_status
 
-  file = @client.scan.download mapped_row[:scan_id],
-                               mapped_row[:file_id],
-                               "#{@results_directory}/#{mapped_row[:request_id].csv}"
-
-  puts file
+  @client.scan.download mapped_row[:scan_id],
+                        mapped_row[:file_id],
+                        "#{@results_directory}/#{mapped_row[:request_id]}.csv"
 end
