@@ -28,7 +28,7 @@ module Nessus6
     # @param scan_id [String, Fixnum] The id of the scan to export.
     # @param query_params [Hash] Includes:
     #   :folder_id [String, Fixnum] - The id of the destination folder.
-    #   :history [TrueClass, FalseClass, String] - If true, the history for
+    #   :history [String] - If true, the history for
     #     the scan will be copied
     #   :name [String] - The name of the copied scan
     # @return [Hash]

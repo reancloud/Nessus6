@@ -19,20 +19,20 @@ module Nessus6
       when 200
         return JSON.parse response.body
       when 400
-        fail Nessus6::Error::BadRequestError, "#{message[:bad_request]}"
+        fail Nessus6::Error::BadRequestError, "#{message[:bad_request]} | Response: #{response.body}"
       when 401
-        fail Nessus6::Error::UnauthorizedError, "#{message[:unauthorized]}"
+        fail Nessus6::Error::UnauthorizedError, "#{message[:unauthorized]} | Response: #{response.body}"
       when 403
-        fail Nessus6::Error::ForbiddenError, "#{message[:forbidden]}"
+        fail Nessus6::Error::ForbiddenError, "#{message[:forbidden]} | Response: #{response.body}"
       when 404
-        fail Nessus6::Error::NotFoundError, "#{message[:not_found]}"
+        fail Nessus6::Error::NotFoundError, "#{message[:not_found]} | Response: #{response.body}"
       when 405
-        fail Nessus6::Error::MethodNotAllowedError, "#{message[:not_allowed]}"
+        fail Nessus6::Error::MethodNotAllowedError, "#{message[:not_allowed]} | Response: #{response.body}"
       when 409
-        fail Nessus6::Error::ConflictError, "#{message[:conflict]}"
+        fail Nessus6::Error::ConflictError, "#{message[:conflict]} | Response: #{response.body}"
       when 500
         fail Nessus6::Error::InternalServerError,
-             "#{message[:internal_server_error]}"
+             "#{message[:internal_server_error]} | Response: #{response.body}"
       else
         fail Nessus6::Error::UnknownError, 'An unknown error occurred. ' \
                            'Please consult Nessus for further details.'

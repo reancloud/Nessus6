@@ -4,6 +4,11 @@ require 'Nessus6'
 require 'fileutils'
 require 'logger'
 require 'sqlite3'
+require 'json'
+
+def create_scan(scan_id_to_copy, opts)
+  @client.scan.copy scan_id_to_copy, opts
+end
 
 def launch_scan(target_scan_id, target_ip_addresses)
   @logger.info 'Attempting to launch scan.'
@@ -30,8 +35,8 @@ end
 @send_mail = '/usr/lib/sendmail -t'
 
 credentials = {
-  access_key: '',
-  secret_key: ''
+  access_key: 'NA',
+  secret_key: 'NA'
 }
 
 nessus_location = {
@@ -39,8 +44,12 @@ nessus_location = {
   port: '8834'
 }
 
-scan = {
-  default: 13
+scan_templates = {
+  allportsnoping: 62,
+  allportswithping: 63,
+  atomic: 64,
+  default: 61,
+  pci: 60
 }
 
 @append_results = "x-scanner|#{nessus_location[:ip]}"
@@ -99,11 +108,14 @@ begin
 
     @logger.info "Found Request ID #{request_id[0]}; Found Method #{method[0]}; Found IP's #{ips}"
 
-    # Take the scan method and find what the scan ID for it is.
-    scan_id_to_launch = scan[method[0].to_sym]
+    # Take the scan method and find the scan template UUID for it.
+    scan_template_id = scan_templates[method[0].to_sym]
+    scan_opts = { name: "Requested Scan ##{request_id[0]}", folder_id: 65,
+                  history: 'false' }
+    scan = create_scan scan_template_id, scan_opts
 
     # Attempt to launch a scan. If it fails, wait 30 seconds then repeat.
-    @result = launch_scan(scan_id_to_launch, ips)
+    @result = launch_scan(scan['id'], ips)
     while @result == false
       sleep 30
       @result = launch_scan(scan_id_to_launch, ips)
@@ -113,11 +125,13 @@ begin
 
     db = SQLite3::Database.new '/home/scripts/launched_nessus_scans.db'
 
-    @logger.info "Inserting scan UUID with 'INSERT INTO active_scans (request_id, method, scan_uuid) VALUES (?, ?, ?)', "\
-                 "[#{request_id[0]}, #{method[0]}, #{@result['scan_uuid']}]'"
+    @logger.debug "Create new db with: require 'sqlite3'; db = SQLite3::Database.new '/home/scripts/launched_nessus_scans.db'; rows = db.execute 'create table active_scans (request_id bigint, method varchar(200), scan_uuid varchar(250), scan_id integer);'"
 
-    db.execute 'INSERT INTO active_scans (request_id, method, scan_uuid) VALUES (?, ?, ?)',
-               [request_id[0], method[0], @result['scan_uuid']]
+    @logger.info "Inserting scan UUID with 'INSERT INTO active_scans (request_id, method, scan_uuid, scan_id) VALUES (?, ?, ?, ?)', "\
+                 "[#{request_id[0]}, #{method[0]}, #{@result['scan_uuid']}, #{scan['id']}]'"
+
+    db.execute 'INSERT INTO active_scans (request_id, method, scan_uuid, scan_id) VALUES (?, ?, ?, ?)',
+               [request_id[0], method[0], @result['scan_uuid'], scan['id']]
 
     @logger.info 'Scan UUID saved successfully.'
 
