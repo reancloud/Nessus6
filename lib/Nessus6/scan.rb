@@ -94,7 +94,7 @@ module Nessus6
       else
         response = @client.get("scans/#{scan_id}", history_id: history_id)
       end
-      JSON.parse response.body
+      ::JSON.parse response.body
     end
 
     # Downloads an exported scan
@@ -104,7 +104,7 @@ module Nessus6
     # @param file_id [String, Fixnum] The id of the file to download (included in response from /scans/{scan_id}/export)
     def download(scan_id, file_id, write_path = nil)
       response = @client.get "scans/#{scan_id}/export/#{file_id}/download"
-      File.open(write_path, 'w+') { |file| file.write response } unless write_path.nil?
+      ::File.open(write_path, 'w+') { |file| file.write response.body } unless write_path.nil?
       begin
         hash_response = verify response,
                         not_found: 'The scan or file does not exist.'
@@ -165,7 +165,7 @@ module Nessus6
     # @return [Hash] Returns the scan list.
     def list
       response = @client.get 'scans'
-      JSON.parse response.body
+      ::JSON.parse response.body
     end
 
     # Pauses a scan.

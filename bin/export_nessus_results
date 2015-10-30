@@ -6,6 +6,25 @@ require 'logger'
 require 'sqlite3'
 require 'json'
 
+# The Nessus6 module is used to interact with Nessus version 6 servers.
+module Nessus6
+  # The Scans class is for interacting with Nessus6 scans.
+  # https://localhost:8834/api#/resources/scans
+  class Scan
+    def download(scan_id, file_id, write_path = nil)
+      response = @client.get "scans/#{scan_id}/export/#{file_id}/download"
+      ::File.open(write_path, 'w+') { |file| file.write response.body } unless write_path.nil?
+      begin
+        hash_response = verify response,
+                        not_found: 'The scan or file does not exist.'
+      rescue
+        hash_response = nil
+      end
+      hash_response
+    end
+  end
+end
+
 # Global variables for the script / binary
 @base_directory = '/opt/scanner'
 @results_directory = "#{@base_directory}/results"
@@ -24,14 +43,14 @@ nessus_location = {
 @append_results = "x-scanner|#{nessus_location[:ip]}"
 
 # Prep work
-@logger = Logger.new(STDOUT)
-@logger.level = Logger::INFO
+@logger = ::Logger.new(STDOUT)
+@logger.level = ::Logger::INFO
 
 # Begin the main portion of the app
 @logger.debug 'Creating Nessus API Client'
 @client = Nessus6::Client.new credentials, nessus_location
 
-@db = SQLite3::Database.new '/home/scripts/launched_nessus_scans.db'
+@db = ::SQLite3::Database.new '/home/scripts/launched_nessus_scans.db'
 @db.execute 'SELECT * FROM active_scans' do |row|
   mapped_row = {
     request_id: row[0],
@@ -43,7 +62,7 @@ nessus_location = {
   mapped_row[:file_id] = @client.scan.export(mapped_row[:scan_id], opts)['file']
 
   # Lock it in a closure so we don't have to have a huge one liner
-  export_status = Proc.new { @client.scan.export_status mapped_row[:scan_id], mapped_row[:file_id] }
+  export_status = ::Proc.new { @client.scan.export_status mapped_row[:scan_id], mapped_row[:file_id] }
   ready_status = { 'status' => 'ready' }
   @logger.debug 'Waiting...' while export_status.call != ready_status
 
