@@ -3,6 +3,7 @@ require 'hurley'
 require 'Nessus6/verification'
 # Inherits from verification
 require 'Nessus6/version'
+require 'Nessus6/agent'
 require 'Nessus6/agent_group'
 require 'Nessus6/editor'
 require 'Nessus6/file'
@@ -48,9 +49,9 @@ module Nessus6
   # The Client class is used to interact with the Nessus API
   class Client
     attr_accessor :client
-    attr_reader :agent_group, :editor, :file, :folder, :group, :permission,
-                :plugin, :plugin_rule, :policy, :scan, :scanner, :server,
-                :session, :user
+    attr_reader :agent, :agent_group, :editor, :file, :folder, :group,
+                :permission, :plugin, :plugin_rule, :policy, :scan, :scanner,
+                :server, :session, :user
 
     def initialize(credentials, nessus)
       nessus[:port] = '8834' unless nessus.key?(:port)
@@ -88,6 +89,7 @@ module Nessus6
     private
 
     def build_clients(client)
+      @agent = Nessus6::Agent.new client
       @agent_group = Nessus6::AgentGroup.new client
       @editor = Nessus6::Editor.new client
       @file = Nessus6::File.new client
