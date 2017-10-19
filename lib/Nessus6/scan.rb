@@ -17,7 +17,7 @@ module Nessus6
     # @param opts [Hash]
     # @return [Hash] Returns information about the scan in question.
     def configure(scan_id, opts)
-      response = client.put "scans/#{scan_id}", opts
+      response = @client.put "scans/#{scan_id}", JsonPayload.new(opts)
       verify response,
              not_found: 'Scan does not exist.',
              internal_server_error: 'Error occurred while saving the configuration'
@@ -50,7 +50,7 @@ module Nessus6
     # @param opts [Hash] The parameters hash required for creating a scan.
     # @return [Hash]
     def create(opts)
-      response = @client.post 'scans', opts
+      response = @client.post 'scans', JsonPayload.new(opts)
       verify response,
              internal_server_error: 'An error occurred while saving the scan.'
     end

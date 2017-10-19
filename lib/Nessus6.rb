@@ -18,8 +18,32 @@ require 'Nessus6/session'
 require 'Nessus6/user'
 require 'Nessus6/error/authentication_error'
 
+require 'json'
+
 # The Nessus6 module is used to interact with Nessus version 6 servers.
 module Nessus6
+  
+  class JsonPayload < Hurley::Query
+    def initialize(initial = {})
+      super(initial)
+    end
+    
+    def to_query_string
+      @hash.to_json
+    end
+    
+    alias to_s to_query_string
+    
+    def to_form(options = nil)
+      if multipart?
+        boundary = (options || RequestOptions.new).boundary
+        return MULTIPART_TYPE % boundary, to_io(boundary)
+      else
+        return 'application/json', StringIO.new(to_query_string)
+      end
+    end
+  end
+   
   # The Client class is used to interact with the Nessus API
   class Client
     attr_accessor :client
