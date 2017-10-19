@@ -17,7 +17,7 @@ module Nessus6
     def verify(response, message = nil)
       case response.status_code
       when 200
-        return JSON.parse response.body
+        return response.body.nil? || response.body.length==0 ? nil : JSON.parse(response.body)
       when 400
         fail Nessus6::Error::BadRequestError, "#{message[:bad_request]} | Response: #{response.body}"
       when 401
