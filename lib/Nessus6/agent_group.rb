@@ -16,7 +16,7 @@ module Nessus6
     # @param group_id [String, Fixnum] The id of the agent group.
     # @param agent_id [String, Fixnum] The id of the agent to add to the group.
     # @return [Hash]
-    def configure(scanner_id, group_id, agent_id)
+    def add_agent(scanner_id, group_id, agent_id)
       response = @client.put "scanners/#{scanner_id}/agent-groups/#{group_id}/agents/#{agent_id}"
       verify response,
              not_found: 'Could not find an agent with the provided ID.',
