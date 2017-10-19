@@ -13,10 +13,10 @@ module Nessus6
     # Delete an agent group
     #
     # @param scanner_id [String, Fixnum] The id of the scanner.
-    # @param group_id [String, Fixnum] The id of the agent to delete.
+    # @param agent_id [String, Fixnum] The id of the agent to delete.
     # @return [Hash]
-    def delete(scanner_id, group_id)
-      response = @client.delete "scanners/#{scanner_id}/agent/#{group_id}"
+    def delete(scanner_id, agent_id)
+      response = @client.delete "scanners/#{scanner_id}/agents/#{agent_id}"
       verify response,
              unauthorized: 'You do not have permission to delete the agent.',
              not_found: 'Could not find an agent with the provided ID.',
@@ -26,10 +26,10 @@ module Nessus6
     # Returns the details for the given agent
     #
     # @param scanner_id [String, Fixnum] The id of the scanner.
-    # @param group_id [String, Fixnum] The id of the agent to retrieve.
+    # @param agent_id [String, Fixnum] The id of the agent to retrieve.
     # @return [Hash]
-    def details(scanner_id, group_id)
-      response = @client.get "scanners/#{scanner_id}/agents/#{group_id}"
+    def details(scanner_id, agent_id)
+      response = @client.get "scanners/#{scanner_id}/agents/#{agent_id}"
       verify response,
              unauthorized: 'You do not have permission to retrieve agents.',
              not_found: 'Could not find an agent group with that ID.'
