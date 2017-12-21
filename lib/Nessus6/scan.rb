@@ -4,13 +4,44 @@ module Nessus6
   # https://localhost:8834/api#/resources/scans
   class Scan
     include Nessus6::Verification
+    
+    Attachment = Struct.new(:filename, :content)
 
     public
 
     def initialize(client)
       @client = client
     end
-
+    
+    # Retrieves an attachment from a given scan
+    #
+    # @param scan_id [String, Integer] The id of the scan to retrieve
+    # @param attachment_id [String, Integer] The id of the attachment to retrieve
+    # @return [Attachment] The attachment
+    def attachment(scan_id, attachment_id, attachment_key)
+      response = @client.get "scans/#{scan_id}/attachments/#{attachment_id}",
+                             key: attachment_key
+      if response.success?
+        # Default filename.
+        filename = "attachment-#{attachment_id}"
+        
+        # Preferred filename.
+        if file = response.header['Content-Disposition']
+          
+          # Find the filename.
+          file.split(/[\s]*;[\s]*/).find do |item|
+            filename = $1 if item =~ /^[\s]*filename[\s]*="([^"]+)"[\s]*$/
+          end
+        end
+        
+        # FIXME:  It would be good to support a stream instead of the entire blob of content.
+        Attachment.new filename, response.body
+      else
+        verify response,
+               internal_server_error: 'Internal server error'
+      end
+    end
+    
     # Changes the schedule or policy parameters of a scan
     #
     # @param scan_id [String, Fixnum] The id of the scan to change.
@@ -188,8 +219,9 @@ module Nessus6
     #   that should be returned
     # @return [Hash] Plugin information object
     def plugin_output(scan_id, host_id, plugin_id, history_id = nil)
+      query = { history_id: history_id } if history_id
       response = @client.get "scans/#{scan_id}/hosts/#{host_id}/plugins/"\
-                             "#{plugin_id}", history_id: history_id
+                             "#{plugin_id}", query
       verify response,
              internal_server_error: 'Internal server error'
     end
