@@ -4,6 +4,8 @@ module Nessus6
   # https://localhost:8834/api#/resources/scans
   class Scan
     include Nessus6::Verification
+    
+    Attachment = Struct.new(:filename, :content)
 
     public
 
@@ -15,12 +17,29 @@ module Nessus6
     #
     # @param scan_id [String, Integer] The id of the scan to retrieve
     # @param attachment_id [String, Integer] The id of the attachment to retrieve
-    # @return [Hash] Plugin information object
+    # @return [Attachment] The attachment
     def attachment(scan_id, attachment_id, attachment_key)
       response = @client.get "scans/#{scan_id}/attachments/#{attachment_id}",
                              key: attachment_key
-      verify response,
-             internal_server_error: 'Internal server error'
+      if response.success?
+        # Default filename.
+        filename = "attachment-#{attachment_id}"
+        
+        # Preferred filename.
+        if file = response.header['Content-Disposition']
+          
+          # Find the filename.
+          file.split(/[\s]*;[\s]*/).find do |item|
+            filename = $1 if item =~ /^[\s]*filename[\s]*="([^"]+)"[\s]*$/
+          end
+        end
+        
+        # FIXME:  It would be good to support a stream instead of the entire blob of content.
+        Attachment.new filename, response.body
+      else
+        verify response,
+               internal_server_error: 'Internal server error'
+      end
     end
     
     # Changes the schedule or policy parameters of a scan
