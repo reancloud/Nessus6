@@ -1,6 +1,6 @@
 # The Nessus6 module is used to interact with Nessus version 6 servers.
 module Nessus6
-  # The Agent class is for defining agent groups
+  # The Agent class is for defining agents 
   class Agent
     include Nessus6::Verification
 

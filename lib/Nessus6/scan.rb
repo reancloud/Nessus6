@@ -10,7 +10,19 @@ module Nessus6
     def initialize(client)
       @client = client
     end
-
+    
+    # Retrieves an attachment from a given scan
+    #
+    # @param scan_id [String, Integer] The id of the scan to retrieve
+    # @param attachment_id [String, Integer] The id of the attachment to retrieve
+    # @return [Hash] Plugin information object
+    def attachment(scan_id, attachment_id, attachment_key)
+      response = @client.get "scans/#{scan_id}/attachments/#{attachment_id}",
+                             key: attachment_key
+      verify response,
+             internal_server_error: 'Internal server error'
+    end
+    
     # Changes the schedule or policy parameters of a scan
     #
     # @param scan_id [String, Fixnum] The id of the scan to change.
@@ -188,8 +200,9 @@ module Nessus6
     #   that should be returned
     # @return [Hash] Plugin information object
     def plugin_output(scan_id, host_id, plugin_id, history_id = nil)
+      query = { history_id: history_id } if history_id
       response = @client.get "scans/#{scan_id}/hosts/#{host_id}/plugins/"\
-                             "#{plugin_id}", history_id: history_id
+                             "#{plugin_id}", query
       verify response,
              internal_server_error: 'Internal server error'
     end
