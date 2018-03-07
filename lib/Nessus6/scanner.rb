@@ -34,5 +34,17 @@ module Nessus6
              forbidden: 'You do not have permission to view the list of agents',
              internal_server_error: 'Server failed to retrieve agent list'
     end
+
+    # Returns the linking key for the given scanner. This request requires
+    # administrator user permissions.
+    #
+    # @param scanner_id [String, Fixnum] The id of the scanner to query for the key.
+    # @return [Hash]
+    def key(scanner_id)
+      response = @client.get("scanners/#{scanner_id}/key")
+      verify response,
+             forbidden: 'You do not have permission to view the agent linking key',
+             internal_server_error: 'Server failed to retrieve agent key'
+    end
   end
 end
